@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    tools:context=".View.HomeFragment">
+
+    <View
+        android:id="@+id/layout_balance"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:background="@drawable/ripple_balance"
+        android:clickable="false"
+        android:focusable="false"
+        app:layout_constraintBottom_toTopOf="@+id/layout_show_ads"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/layout_show_ads"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:background="@drawable/ripple_ads"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toTopOf="@+id/layout_charge"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_balance" />
+
+    <View
+        android:id="@+id/layout_charge"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:background="@drawable/ripple_charge"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_show_ads"
+        app:layout_constraintVertical_chainStyle="spread" />
+
+    <TextView
+        android:id="@+id/tv_balance_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="44dp"
+        android:fontFamily="@font/vazir_medium"
+        android:text="@string/your_balance"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/layout_show_ads"
+        app:layout_constraintEnd_toEndOf="@+id/layout_balance"
+        app:layout_constraintStart_toStartOf="@+id/layout_balance"
+        app:layout_constraintTop_toTopOf="@+id/layout_balance" />
+
+    <TextView
+        android:id="@+id/tv_balance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:fontFamily="@font/vazir_medium"
+        android:gravity="center"
+        android:text="0"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/layout_show_ads"
+        app:layout_constraintEnd_toEndOf="@+id/tv_balance_title"
+        app:layout_constraintStart_toStartOf="@+id/tv_balance_title"
+        app:layout_constraintTop_toBottomOf="@+id/tv_balance_title"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/tv_toman"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/vazir_medium"
+        android:text="@string/toman"
+        android:textColor="#666666"
+        app:layout_constraintBottom_toTopOf="@+id/layout_show_ads"
+        app:layout_constraintEnd_toStartOf="@+id/tv_balance"
+        app:layout_constraintTop_toTopOf="@+id/tv_balance"
+        app:layout_constraintVertical_bias="0.28" />
+
+    <TextView
+        android:id="@+id/tv_show_ads_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:fontFamily="@font/vazir_medium"
+        android:text="@string/show_ads"
+        android:textColor="#ffffff"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_show_ads"
+        app:layout_constraintEnd_toEndOf="@+id/layout_show_ads"
+        app:layout_constraintStart_toStartOf="@id/layout_show_ads"
+        app:layout_constraintTop_toTopOf="@+id/layout_show_ads" />
+
+    <TextView
+        android:id="@+id/tv_vpn_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="@font/vazir_medium"
+        android:gravity="center"
+        android:text="@string/vpn_hint"
+        android:textAlignment="center"
+        android:textColor="#ffffff"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_show_ads"
+        app:layout_constraintEnd_toEndOf="@+id/layout_show_ads"
+        app:layout_constraintStart_toStartOf="@id/layout_show_ads"
+        app:layout_constraintTop_toBottomOf="@+id/tv_show_ads_title"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/tv_charge_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:fontFamily="@font/vazir_medium"
+        android:text="@string/charge_sim_balance"
+        android:textColor="#ffffff"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_charge"
+        app:layout_constraintEnd_toEndOf="@+id/layout_charge"
+        app:layout_constraintStart_toStartOf="@+id/layout_charge"
+        app:layout_constraintTop_toTopOf="@+id/layout_charge" />
+
+    <TextView
+        android:id="@+id/tv_charge_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:ellipsize="marquee"
+        android:ems="15"
+        android:fontFamily="@font/vazir_medium"
+        android:gravity="center"
+        android:text="@string/charge_hint"
+        android:textAlignment="center"
+        android:textColor="#ffffff"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_charge"
+        app:layout_constraintEnd_toEndOf="@+id/layout_charge"
+        app:layout_constraintStart_toStartOf="@id/layout_charge"
+        app:layout_constraintTop_toBottomOf="@+id/tv_charge_title"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ProgressBar
+        android:id="@+id/pb_ads"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_show_ads"
+        app:layout_constraintEnd_toEndOf="@+id/tv_show_ads_title"
+        app:layout_constraintStart_toStartOf="@+id/tv_show_ads_title"
+        app:layout_constraintTop_toBottomOf="@+id/tv_vpn_hint"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ProgressBar
+        android:id="@+id/pb_charge"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_charge"
+        app:layout_constraintEnd_toEndOf="@+id/tv_charge_title"
+        app:layout_constraintStart_toStartOf="@+id/tv_charge_title"
+        app:layout_constraintTop_toBottomOf="@+id/tv_charge_hint"
+        app:layout_constraintVertical_bias="0.0" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,139 @@
+package com.ads.milioner.View
+
+import android.annotation.SuppressLint
+import android.graphics.Color
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
+import com.ads.milioner.Model.AppManager
+import com.ads.milioner.Model.network.NetworkRepositoryImpl
+import com.ads.milioner.Model.network.model.ResponseListener
+import com.ads.milioner.R
+import com.ads.milioner.ViewModel.LoginViewModel
+import com.ads.milioner.util.CustomUtils
+import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
+import com.jakewharton.rxbinding2.widget.RxTextView
+import com.transitionseverywhere.TransitionManager
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.login_fragment.*
+import kotlinx.android.synthetic.main.login_fragment.view.*
+import org.koin.android.ext.android.inject
+
+
+class LoginFragment : Fragment() {
+
+    companion object {
+        fun newInstance() = LoginFragment()
+    }
+
+    private lateinit var viewModel: LoginViewModel
+
+    private val network: NetworkRepositoryImpl by inject()
+
+    lateinit var disposable: Disposable
+    var isConnected = false
+
+    override fun onDestroy() {
+        disposable.dispose()
+        super.onDestroy()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        disposable = ReactiveNetwork
+            .observeInternetConnectivity(AppManager.settings)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                isConnected = it
+            }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.login_fragment, container, false)
+    }
+
+    @SuppressLint("CheckResult")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        TransitionManager.beginDelayedTransition((view as ViewGroup?)!!)
+
+        RxTextView.afterTextChangeEvents(view.et_code!!)
+            .skipInitialValue()
+            .subscribe {
+                val text = view.et_code.text.toString()
+                if (text.length < 11 || text.isEmpty()) {
+                    btn_login.isEnabled = false
+                    btn_login.setTextColor(Color.parseColor("#A6A6A6"))
+                    btn_login.background = activity?.resources?.getDrawable(R.drawable.btn_disabled_bkg, null)
+                } else {
+                    btn_login.isEnabled = true
+                    btn_login.setTextColor(Color.parseColor("#ffffff"))
+                    btn_login.background = activity?.resources?.getDrawable(R.drawable.button_bkg, null)
+                }
+            }
+
+        view.btn_login.setOnClickListener { v ->
+            CustomUtils.hideKeyboard(activity)
+            if (progressBar.visibility != View.VISIBLE) {
+                progressBar.visibility = View.VISIBLE
+                btn_login.text = ""
+                if (isConnected) {
+                    login()
+                } else {
+                    updateState("دستگاه به اینترنت متصل نیست", true)
+                }
+            }
+
+        }
+    }
+
+    private fun login() {
+        network.register("98${et_code.text.toString().substring(1)}", object : ResponseListener {
+            override fun onSuccess(message: String) {
+                Log.d(AppManager.TAG, message)
+                updateState(message, false)
+
+                findNavController().navigate(R.id.action_loginFragment_to_checkCodeFragment)
+            }
+
+            override fun onFailure(message: String) {
+                Log.d(AppManager.TAG, message)
+                updateState(message, true)
+            }
+
+        })
+
+    }
+
+    private fun updateState(message: String, isError: Boolean) {
+        if (isError) {
+            tv_error.text = message
+            tv_error.visibility = View.VISIBLE
+            progressBar.visibility = View.GONE
+            btn_login.text = activity?.getString(R.string.get_activation_code)
+        } else {
+            tv_error.text = ""
+            tv_error.visibility = View.GONE
+            progressBar.visibility = View.GONE
+            btn_login.text = activity?.getString(R.string.get_activation_code)
+        }
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+    }
+
+}

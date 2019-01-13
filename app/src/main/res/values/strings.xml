@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Milioner</string>
+    <string name="milioner_become_millionaire">Milioner - Become Millionaire</string>
+    <string name="login">Login</string>
+    <string name="get_activation_code">Get Activation Code</string>
+    <string name="eg_0912">eg: 0912*******</string>
+    <string name="network_error">Network_Error</string>
+    <string name="please_enter_your_phone_number">Please Enter Your Phone Number</string>
+    <string name="wrong_number">Wrong Number?</string>
+    <string name="activation_code">Activation Code</string>
+    <string name="please_enter_activation_code_sent_to_989121233256">Please Enter Activation Code Sent to 989121233256</string>
+    <string name="confirm_activation_code">Confirm Activation Code</string>
+    <string name="milioner_farsi">میلیونر</string>
+    <string name="your_balance">موجودی شما</string>
+    <string name="toman">تومان</string>
+    <string name="show_ads">مشاهده تبلیغ</string>
+    <string name="vpn_hint">برای مشاهده تبلیغ حتما باید به VPN متصل باشید</string>
+    <string name="charge_sim_balance">خرید شارژ موبایل</string>
+    <string name="charge_hint">با هر بار درخواست مقدار 1000 تومان از مبلغ موجودی شما کم و به ازای آن خط شما شارژ می‌گردد</string>
+    <string name="resend">Resend</string>
+</resources>
