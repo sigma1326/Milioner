@@ -7,39 +7,60 @@ import com.ads.milioner.Model.database.DataBaseRepositoryImpl
 import com.ads.milioner.Model.database.model.User
 import com.ads.milioner.Model.network.model.*
 import io.reactivex.android.schedulers.AndroidSchedulers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 
 @SuppressLint("CheckResult")
 class NetworkRepositoryImpl(private val apiService: ApiService, private val db: DataBaseRepositoryImpl) :
     NetworkRepository {
+    override fun refresh(token: String, responseListener: ResponseListener) {
+        apiService.refresh(token)
+            .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                if (it.body() is RefreshResponse) {
+                    Log.d(AppManager.TAG, it.body()!!.token)
+                    val user = db.getUser()
+                    user?.let { usr ->
+                        usr.token = it.body()!!.token
+                        db.insertUser(usr)
+                    }
+                    responseListener.onSuccess("success refresh")
+                } else {
+                    responseListener.onFailure("failed refresh")
+                    responseListener.onFailure(it.errorBody()?.string()!!.toString())
+                }
+            }, {
+                it.printStackTrace()
+                responseListener.onFailure("failed refresh")
+
+            })
+    }
+
     override fun ads(
         token: String,
         gid: String,
         hash: String,
         timeStamp: String,
-        b: String,
         responseListener: ResponseListener
     ) {
-        apiService.ads("jwt $token", gid, hash, timeStamp, b)
+        apiService.ads("jwt $token", gid, hash, timeStamp)
             .subscribeOn(io.reactivex.schedulers.Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 if (it.body() is AdsResponse) {
-                    Log.d(AppManager.TAG, it.body()!!.reward.toString())
-                    Log.d(AppManager.TAG, it.body()!!.money.toString())
+                    Log.d(AppManager.TAG, "reward: " + it.body()!!.reward.toString())
+                    Log.d(AppManager.TAG, "money :" + it.body()!!.money.toString())
 
-                    val user = db.getUser()
-                    if (user != null) {
-                        user.balance = it.body()!!.money
-                        db.insertUser(user)
-                    }
-                    responseListener.onFailure(it.body()!!.reward.toString())
+                    it.body()!!.money?.let { it1 -> db.updateBalance(it1) }
+                    responseListener.onSuccess(it.body()!!.reward.toString())
                 } else {
-                    responseListener.onFailure("failed")
+                    responseListener.onFailure("failed ads")
                     responseListener.onFailure(it.errorBody()?.string()!!.toString())
                 }
             }, {
                 it.printStackTrace()
-                responseListener.onFailure("failed")
+                responseListener.onFailure("failed ads")
 
             })
     }
@@ -54,12 +75,12 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
 
                     responseListener.onSuccess(it.body()!!.status.toString())
                 } else {
-                    responseListener.onFailure("failed")
+                    responseListener.onFailure("failed check ip")
                     responseListener.onFailure(it.errorBody()?.string()!!.toString())
                 }
             }, {
                 it.printStackTrace()
-                responseListener.onFailure("failed")
+                responseListener.onFailure("failed check ip")
 
             })
     }
@@ -73,20 +94,16 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
                     Log.d(AppManager.TAG, it.body()!!.success.toString())
                     Log.d(AppManager.TAG, it.body()!!.money.toString())
 
-                    val user = db.getUser()
-                    if (user != null) {
-                        user.balance = it.body()!!.money
-                        db.insertUser(user)
-                    }
+                    it.body()!!.money?.let { it1 -> db.updateBalance(it1) }
 
-                    responseListener.onSuccess(it.body()!!.success.toString())
+                    responseListener.onSuccess(db.getUser()?.balance.toString())
                 } else {
-                    responseListener.onFailure("failed")
+                    responseListener.onFailure("failed charge")
                     responseListener.onFailure(it.errorBody()?.string()!!.toString())
                 }
             }, {
                 it.printStackTrace()
-                responseListener.onFailure("failed")
+                responseListener.onFailure("failed charge")
 
             })
     }
@@ -106,14 +123,14 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
                         usr.balance = it.body()!!.money!!
                         db.insertUser(usr)
                     }
-                    responseListener.onSuccess("success")
+                    responseListener.onSuccess("success me")
                 } else {
-                    responseListener.onFailure("failed")
+                    responseListener.onFailure("failed me")
                     responseListener.onFailure(it.errorBody()?.string()!!.toString())
                 }
             }, {
                 it.printStackTrace()
-                responseListener.onFailure("failed")
+                responseListener.onFailure("failed me")
 
             })
     }
@@ -137,12 +154,12 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
                     }
                     db.insertUser(user)
 
-                    responseListener.onSuccess("success")
+                    responseListener.onSuccess("success login")
                 } else {
                     responseListener.onFailure(it.errorBody()?.string()!!.toString())
                 }
             }, {
-                responseListener.onFailure("failed")
+                responseListener.onFailure("failed login")
                 it.printStackTrace()
             })
     }
@@ -154,12 +171,12 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
             .subscribe({
                 if (it.body()?.phone == phone) {
                     AppManager.phone = phone
-                    responseListener.onSuccess("success")
+                    responseListener.onSuccess("success register")
                 } else {
-                    responseListener.onFailure("failed")
+                    responseListener.onFailure("failed register")
                 }
             }, {
-                responseListener.onFailure("failed")
+                responseListener.onFailure("failed register")
                 it.printStackTrace()
             })
     }

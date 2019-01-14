@@ -1,17 +1,20 @@
 package com.ads.milioner.Model
 
 import android.util.Log
+import android.widget.Toast
 import androidx.multidex.MultiDexApplication
 import androidx.room.Room
 import com.ads.milioner.Model.database.DataBase
 import com.ads.milioner.Model.database.DataBaseRepositoryImpl
 import com.ads.milioner.Model.network.ApiService
 import com.ads.milioner.Model.network.NetworkRepositoryImpl
+import com.ads.milioner.Model.network.model.ResponseListener
 import com.ads.milioner.ads.InterstitialFetcher
 import com.ads.milioner.ads.PlacementId
 import com.facebook.stetho.Stetho
 import com.github.pwittchen.reactivenetwork.library.rx2.internet.observing.InternetObservingSettings
 import com.github.pwittchen.reactivenetwork.library.rx2.internet.observing.strategy.SocketInternetObservingStrategy
+import com.google.common.hash.Hashing
 import com.inmobi.ads.InMobiAdRequest
 import com.inmobi.ads.InMobiAdRequestStatus
 import com.inmobi.ads.InMobiInterstitial
@@ -19,6 +22,7 @@ import com.inmobi.sdk.InMobiSdk
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONException
 import org.json.JSONObject
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.android.startKoin
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module.module
@@ -26,6 +30,8 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig
+import java.nio.charset.StandardCharsets
+import java.util.*
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -34,6 +40,10 @@ class AppManager : MultiDexApplication() {
     private var mIntQueue: BlockingQueue<InMobiInterstitial> = LinkedBlockingQueue()
     private var mIntFetcherQueue: BlockingQueue<InterstitialFetcher> = LinkedBlockingQueue<InterstitialFetcher>()
     private lateinit var interstitialAdRequestListener: InMobiInterstitial.InterstitialAdRequestListener
+
+    private lateinit var network: NetworkRepositoryImpl
+    private lateinit var db: DataBaseRepositoryImpl
+
 
     override fun onCreate() {
         super.onCreate()
@@ -53,6 +63,14 @@ class AppManager : MultiDexApplication() {
         )
 
         initADS()
+        db = DataBaseRepositoryImpl(
+            Room.databaseBuilder(
+                this, DataBase::class.java,
+                DB_NAME
+            ).allowMainThreadQueries()
+                .build()
+        )
+        network = NetworkRepositoryImpl(retrofit.create(ApiService::class.java), db)
     }
 
 
@@ -119,7 +137,7 @@ class AppManager : MultiDexApplication() {
 
 
     companion object {
-        private const val host = "http://fdli.ir:8000"
+        private const val host = "https://apanaj.fdli.ir"
         const val TAG = "debug"
         private const val DB_NAME = "milioner-db"
         var token = ""
@@ -144,7 +162,7 @@ class AppManager : MultiDexApplication() {
             //Network
             single { NetworkRepositoryImpl(get(), get()) }
 
-            single { retrofit.create(ApiService::class.java)!! }
+            single { retrofit.create(ApiService::class.java) }
 
             //DataBase
             single {
@@ -157,7 +175,48 @@ class AppManager : MultiDexApplication() {
 
             single { DataBaseRepositoryImpl(get()) }
         }
+
+
     }
 
+
+    fun deactivateReward() {
+        val user = db.getUser()
+        if (user != null) {
+            user.isRewardActive = false
+            db.insertUser(user)
+        }
+    }
+
+    fun callAdsAPI() {
+        val user = db.getUser()
+        if (user != null) {
+            user.isRewardActive = true
+            db.insertUser(user)
+        }
+        if (user != null) {
+            if (user.isRewardActive!!) {
+                val gid = UUID.randomUUID().toString()
+                val timeStamp = System.currentTimeMillis().toString()
+                val hashString = "$timeStamp$gid$timeStamp${user.apiKey}"
+                val hash = Hashing.sha256().hashString(hashString, StandardCharsets.UTF_8).toString()
+
+                network.ads(
+                    user.token.toString()
+                    , gid, hash, timeStamp
+                    , object : ResponseListener {
+                        override fun onSuccess(message: String) {
+                            Log.d(AppManager.TAG, message)
+                            deactivateReward()
+                        }
+
+                        override fun onFailure(message: String) {
+                            Log.d(AppManager.TAG, message)
+                        }
+
+                    })
+            }
+        }
+    }
 
 }

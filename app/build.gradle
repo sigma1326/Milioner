@@ -117,9 +117,11 @@ dependencies {
 
     implementation 'com.android.support:multidex:1.0.3'
 
-    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
 
     //noinspection UseOfBundledGooglePlayServices
     implementation "com.google.android.gms:play-services:12.0.1"
+
+    api 'com.google.guava:guava:27.0.1-android'
 
 }

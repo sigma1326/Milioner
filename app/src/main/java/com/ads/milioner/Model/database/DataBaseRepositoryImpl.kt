@@ -6,6 +6,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 
 class DataBaseRepositoryImpl(private val db: DataBase) : DataBaseRepository {
+    override fun updateBalance(balance: Long) {
+        GlobalScope.async {
+            db.userDAO().updateBalance(balance)
+        }
+    }
+
     override fun clearData() {
         GlobalScope.async {
             db.userDAO().deleteAll()
@@ -25,7 +31,6 @@ class DataBaseRepositoryImpl(private val db: DataBase) : DataBaseRepository {
             db.userDAO().insert(user)
         }
     }
-
 
 
 }

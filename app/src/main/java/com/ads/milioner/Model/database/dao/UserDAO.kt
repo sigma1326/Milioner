@@ -25,4 +25,7 @@ interface UserDAO {
 
     @Update()
     fun update(user: User)
+
+    @Query("UPDATE user SET balance = :balance WHERE user_id=1")
+    fun updateBalance(balance: Long)
 }

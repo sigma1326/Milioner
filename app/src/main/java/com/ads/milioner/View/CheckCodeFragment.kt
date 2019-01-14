@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.ads.milioner.Model.AppManager
+import com.ads.milioner.Model.database.DataBaseRepositoryImpl
 import com.ads.milioner.Model.network.NetworkRepositoryImpl
 import com.ads.milioner.Model.network.model.ResponseListener
 import com.ads.milioner.R
@@ -37,6 +38,8 @@ class CheckCodeFragment : Fragment() {
 
     private lateinit var viewModel: CheckCodeViewModel
     private val network: NetworkRepositoryImpl by inject()
+    private val db: DataBaseRepositoryImpl by inject()
+
     var timer: CountDownTimer? = null
 
     lateinit var disposable: Disposable
@@ -172,9 +175,21 @@ class CheckCodeFragment : Fragment() {
         network.login(AppManager.phone, et_code.text.toString(), object : ResponseListener {
             override fun onSuccess(message: String) {
                 Log.d(AppManager.TAG, message)
-                updateState(message, false)
-                activity?.finish()
-                activity?.startActivity(Intent(activity, MainActivity::class.java))
+                AppManager.token.let {
+                    network.me(it, object : ResponseListener {
+                        override fun onSuccess(message: String) {
+                            Log.d(AppManager.TAG, message)
+                            updateState(message, false)
+                            activity?.finish()
+                            activity?.startActivity(Intent(activity, MainActivity::class.java))
+                        }
+
+                        override fun onFailure(message: String) {
+                            Log.d(AppManager.TAG, message)
+                            updateState(message, true)
+                        }
+                    })
+                }
             }
 
             override fun onFailure(message: String) {
@@ -188,16 +203,20 @@ class CheckCodeFragment : Fragment() {
     }
 
     private fun updateState(message: String, isError: Boolean) {
-        if (isError) {
-            tv_error.text = message
-            tv_error.visibility = View.VISIBLE
-            progressBar.visibility = View.GONE
-            btn_login.text = activity?.getString(R.string.login)
-        } else {
-            tv_error.text = ""
-            tv_error.visibility = View.GONE
-            progressBar.visibility = View.GONE
-            btn_login.text = activity?.getString(R.string.login)
+        try {
+            if (isError) {
+                tv_error.text = message
+                tv_error.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
+                btn_login.text = activity?.getString(R.string.login)
+            } else {
+                tv_error.text = ""
+                tv_error.visibility = View.GONE
+                progressBar.visibility = View.GONE
+                btn_login.text = activity?.getString(R.string.login)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

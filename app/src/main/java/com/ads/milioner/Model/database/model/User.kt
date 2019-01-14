@@ -11,6 +11,7 @@ data class User(
     , @ColumnInfo(name = "balance") var balance: Long?
     , @ColumnInfo(name = "api_key") var apiKey: String? = ""
     , @ColumnInfo(name = "token") var token: String? = ""
+    , @ColumnInfo(name = "is_reward_active") var isRewardActive: Boolean? = false
 ) {
     init {
         userID = 1

@@ -19,6 +19,11 @@ interface ApiService {
     @GET("/users/me")
     fun me(@Header("Authorization") authorization: String): Observable<Response<MeResponse>>
 
+    @POST("/users/refresh/")
+    @FormUrlEncoded
+    fun refresh(@Field("token") token: String): Observable<Response<RefreshResponse>>
+
+
     @GET("/api/charge/")
     fun charge(@Header("Authorization") authorization: String): Observable<Response<ChargeResponse>>
 
@@ -31,7 +36,7 @@ interface ApiService {
     fun ads(
         @Header("Authorization") authorization: String
         , @Field("gid") gid: String, @Field("hash") hash: String,
-        @Field("timestamp") timestamp: String, @Field("b") b: String
+        @Field("timestamp") timestamp: String
     ): Observable<Response<AdsResponse>>
 
 }

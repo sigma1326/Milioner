@@ -7,9 +7,11 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.ads.milioner.Model.AppManager
 import com.ads.milioner.Model.database.DataBaseRepositoryImpl
 import com.ads.milioner.Model.network.NetworkRepositoryImpl
 import com.ads.milioner.Model.network.model.ResponseListener
@@ -32,8 +34,17 @@ class MainActivity : AppCompatActivity() {
 
         val user = db.getUser()
         user?.token?.let {
-            network.me(it, object : ResponseListener {
+            network.refresh(it, object : ResponseListener {
                 override fun onSuccess(message: String) {
+                    network.me(it, object : ResponseListener {
+                        override fun onSuccess(message: String) {
+                            Log.d(AppManager.TAG, message)
+                        }
+
+                        override fun onFailure(message: String) {
+                            Log.d(AppManager.TAG, message)
+                        }
+                    })
                 }
 
                 override fun onFailure(message: String) {

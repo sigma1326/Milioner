@@ -8,4 +8,5 @@ interface DataBaseRepository {
     fun getUserLiveData(): LiveData<User>
     fun insertUser(user: User)
     fun clearData()
+    fun updateBalance(balance:Long)
 }

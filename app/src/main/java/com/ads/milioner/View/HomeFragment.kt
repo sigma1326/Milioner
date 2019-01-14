@@ -3,7 +3,6 @@ package com.ads.milioner.View
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
-import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -32,11 +31,6 @@ import kotlinx.android.synthetic.main.home_fragment.*
 import org.json.JSONException
 import org.json.JSONObject
 import org.koin.android.ext.android.inject
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
-import java.util.*
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 
 
 class HomeFragment : Fragment() {
@@ -44,11 +38,9 @@ class HomeFragment : Fragment() {
     private val db: DataBaseRepositoryImpl by inject()
 
     private var interstitialApplication: AppManager? = null
-    private var interstitialFetcher: InterstitialFetcher? = null
+
     private val TAG = AppManager.TAG
     private val mHandler = Handler()
-    private val forcedRetry = AtomicInteger(0)
-    private var mInterstitialAd: InMobiInterstitial? = null
 
 
     companion object {
@@ -71,25 +63,46 @@ class HomeFragment : Fragment() {
             }
 
 
-        initAds()
-
-        forcedRetry.set(0)
-        prefetchInterstitial()
-
-//        if (null == mInterstitialAd) {
-//            setupInterstitial()
-//        } else {
-//            mInterstitialAd?.load()
-//            mInterstitialAd?.show()
-//        }
-
-
     }
 
 
     override fun onDestroy() {
         disposable.dispose()
         super.onDestroy()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(AppManager.TAG, "start")
+        viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
+        viewModel.user = db.getUserLiveData()
+        viewModel.user.observe(activity!!, Observer {
+            if (it != null && tv_balance != null) {
+                tv_balance.text = it.balance.toString()
+                Log.d(AppManager.TAG, "money :: " + it.balance.toString())
+            }
+        })
+
+
+
+
+
+        initAds()
+
+        viewModel.forcedRetry.set(0)
+        prefetchInterstitial()
+
+        db.getUser()?.token?.let {
+            network.me(it, object : ResponseListener {
+                override fun onSuccess(message: String) {
+                    Log.d(AppManager.TAG, message)
+                }
+
+                override fun onFailure(message: String) {
+                    Log.d(AppManager.TAG, message)
+                }
+            })
+        }
     }
 
     override fun onCreateView(
@@ -133,38 +146,14 @@ class HomeFragment : Fragment() {
 
     }
 
-    private fun getTimeStamp(): String {
-        return TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()).toString()
-    }
 
     private fun showAds() {
-        //todo should not be here
-        playAds()
         db.getUser().let {
             network.checkIP(object : ResponseListener {
                 override fun onSuccess(message: String) {
                     when (message) {
                         "true" -> {
-                            val gid = UUID.randomUUID().toString()
-                            val timeStamp = getTimeStamp()
-                            val hashString = "$timeStamp$gid$timeStamp${it?.apiKey}"
-                            val hash = sha256(hashString)
-                            network.ads(it?.token.toString()
-                                , gid, hash, timeStamp, hashString
-                                , object : ResponseListener {
-                                    override fun onSuccess(message: String) {
-                                        Log.d(AppManager.TAG, message)
-                                        updateState()
-                                        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
-                                    }
-
-                                    override fun onFailure(message: String) {
-                                        Log.d(AppManager.TAG, message)
-                                        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
-                                        updateState()
-                                    }
-
-                                })
+                            playAds()
                         }
                         "false" -> {
                             Toast.makeText(activity, "لطفا با VPN وصل شوید", Toast.LENGTH_SHORT).show()
@@ -189,16 +178,8 @@ class HomeFragment : Fragment() {
     private fun playAds() {
         pb_ads.visibility = View.VISIBLE
         setupInterstitial()
-        mInterstitialAd?.load()
-        mInterstitialAd?.show()
-    }
-
-    @Throws(NoSuchAlgorithmException::class)
-    fun sha256(text: String): String {
-        val md = MessageDigest.getInstance("SHA-256")
-        md.update(text.toByteArray())
-        val digest = md.digest()
-        return android.util.Base64.encodeToString(digest, Base64.DEFAULT)
+        viewModel.mInterstitialAd?.load()
+        viewModel.mInterstitialAd?.show()
     }
 
     private fun charge() {
@@ -226,13 +207,6 @@ class HomeFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
-        viewModel.user = db.getUserLiveData()
-        viewModel.user.observe(this, Observer {
-            if (it != null && tv_balance != null) {
-                tv_balance.text = it.balance.toString()
-            }
-        })
     }
 
     private fun initAds() {
@@ -248,23 +222,25 @@ class HomeFragment : Fragment() {
         InMobiSdk.setLogLevel(InMobiSdk.LogLevel.DEBUG)
         interstitialApplication = this.activity?.application as AppManager
 
-        interstitialFetcher = object : InterstitialFetcher {
+        viewModel.interstitialFetcher = object : InterstitialFetcher {
             override fun onFetchSuccess() {
                 setupInterstitial()
             }
 
             override fun onFetchFailure() {
-                if (forcedRetry.getAndIncrement() < 2) {
-                    mHandler.postDelayed({ interstitialApplication?.fetchInterstitial(interstitialFetcher) }, 5000)
+                if (viewModel.forcedRetry.getAndIncrement() < 2) {
+                    mHandler.postDelayed(
+                        { interstitialApplication?.fetchInterstitial(viewModel.interstitialFetcher) },
+                        5000
+                    )
                 } else {
-//                    adjustButtonVisibility()
                 }
             }
         }
     }
 
     private fun setupInterstitial() {
-        mInterstitialAd = InMobiInterstitial(activity, PlacementId.YOUR_PLACEMENT_ID,
+        viewModel.mInterstitialAd = InMobiInterstitial(activity, PlacementId.YOUR_PLACEMENT_ID,
             object : InterstitialAdEventListener() {
                 override fun onAdLoadSucceeded(inMobiInterstitial: InMobiInterstitial?) {
                     super.onAdLoadSucceeded(inMobiInterstitial)
@@ -273,8 +249,8 @@ class HomeFragment : Fragment() {
                     if (inMobiInterstitial?.isReady!!) {
                         Log.d(TAG, "Ad is Ready")
                         try {
-                            mInterstitialAd?.load()
-                            mInterstitialAd?.show()
+                            viewModel.mInterstitialAd?.load()
+                            viewModel.mInterstitialAd?.show()
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
@@ -340,6 +316,7 @@ class HomeFragment : Fragment() {
                     super.onRewardsUnlocked(inMobiInterstitial, map)
                     Log.d(TAG, "onRewardsUnlocked " + map!!.size)
                     updateState()
+                    (activity?.application as AppManager).callAdsAPI()
                 }
             })
     }
@@ -349,21 +326,21 @@ class HomeFragment : Fragment() {
     }
 
     private fun prefetchInterstitial() {
-        mInterstitialAd = interstitialApplication?.getInterstitial()
-        if (null == mInterstitialAd) {
-            interstitialApplication?.fetchInterstitial(interstitialFetcher)
+        viewModel.mInterstitialAd = interstitialApplication?.getInterstitial()
+        if (null == viewModel.mInterstitialAd) {
+            interstitialApplication?.fetchInterstitial(viewModel.interstitialFetcher)
             return
         }
 
-        mInterstitialAd?.setListener(object : InterstitialAdEventListener() {
+        viewModel.mInterstitialAd?.setListener(object : InterstitialAdEventListener() {
             override fun onAdLoadSucceeded(inMobiInterstitial: InMobiInterstitial?) {
                 super.onAdLoadSucceeded(inMobiInterstitial)
-                Log.d(TAG, "onAdLoadSuccessful")
+                Log.d(TAG, "onAdLoadSuccessful 1")
                 updateState()
                 if (inMobiInterstitial!!.isReady) {
-                    Log.d(TAG, "Ad is Ready")
+                    Log.d(TAG, "Ad is Ready 1")
                 } else {
-                    Log.d(TAG, "onAdLoadSuccessful inMobiInterstitial not ready")
+                    Log.d(TAG, "onAdLoadSuccessful inMobiInterstitial not ready 1 ")
                 }
             }
 
@@ -372,59 +349,60 @@ class HomeFragment : Fragment() {
                 inMobiAdRequestStatus: InMobiAdRequestStatus?
             ) {
                 super.onAdLoadFailed(inMobiInterstitial, inMobiAdRequestStatus)
-                Log.d(TAG, "Unable to load interstitial ad (error message: " + inMobiAdRequestStatus!!.message)
+                Log.d(TAG, "Unable to load interstitial ad 1 (error message: " + inMobiAdRequestStatus!!.message)
                 updateState()
             }
 
             override fun onAdReceived(inMobiInterstitial: InMobiInterstitial?) {
                 super.onAdReceived(inMobiInterstitial)
                 updateState()
-                Log.d(TAG, "onAdReceived")
+                Log.d(TAG, "onAdReceived 1 ")
             }
 
             override fun onAdClicked(inMobiInterstitial: InMobiInterstitial?, map: Map<Any, Any>?) {
                 super.onAdClicked(inMobiInterstitial, map)
-                Log.d(TAG, "onAdClicked " + map!!.size)
+                Log.d(TAG, "onAdClicked 1" + map!!.size)
                 updateState()
             }
 
             override fun onAdWillDisplay(inMobiInterstitial: InMobiInterstitial?) {
                 super.onAdWillDisplay(inMobiInterstitial)
-                Log.d(TAG, "onAdWillDisplay " + inMobiInterstitial!!)
+                Log.d(TAG, "onAdWillDisplay 1" + inMobiInterstitial!!)
                 updateState()
             }
 
             override fun onAdDisplayed(inMobiInterstitial: InMobiInterstitial?) {
                 super.onAdDisplayed(inMobiInterstitial)
-                Log.d(TAG, "onAdDisplayed " + inMobiInterstitial!!)
+                Log.d(TAG, "onAdDisplayed 1" + inMobiInterstitial!!)
                 updateState()
             }
 
             override fun onAdDisplayFailed(inMobiInterstitial: InMobiInterstitial?) {
                 super.onAdDisplayFailed(inMobiInterstitial)
-                Log.d(TAG, "onAdDisplayFailed " + "FAILED")
+                Log.d(TAG, "onAdDisplayFailed 1" + "FAILED")
                 updateState()
             }
 
             override fun onAdDismissed(inMobiInterstitial: InMobiInterstitial?) {
                 super.onAdDismissed(inMobiInterstitial)
-                Log.d(TAG, "onAdDismissed " + inMobiInterstitial!!)
+                Log.d(TAG, "onAdDismissed 1" + inMobiInterstitial!!)
                 updateState()
             }
 
             override fun onUserLeftApplication(inMobiInterstitial: InMobiInterstitial?) {
                 super.onUserLeftApplication(inMobiInterstitial)
-                Log.d(TAG, "onUserWillLeaveApplication " + inMobiInterstitial!!)
+                Log.d(TAG, "onUserWillLeaveApplication 1" + inMobiInterstitial!!)
                 updateState()
             }
 
             override fun onRewardsUnlocked(inMobiInterstitial: InMobiInterstitial?, map: Map<Any, Any>?) {
                 super.onRewardsUnlocked(inMobiInterstitial, map)
-                Log.d(TAG, "onRewardsUnlocked " + map!!.size)
+                Log.d(TAG, "onRewardsUnlocked 1 " + map!!.size)
                 updateState()
+                (activity?.application as AppManager).callAdsAPI()
             }
         })
-        mInterstitialAd?.load()
+        viewModel.mInterstitialAd?.load()
     }
 
 }
