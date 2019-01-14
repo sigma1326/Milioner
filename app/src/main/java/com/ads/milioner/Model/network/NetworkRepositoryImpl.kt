@@ -96,7 +96,7 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
 
                     it.body()!!.money?.let { it1 -> db.updateBalance(it1) }
 
-                    responseListener.onSuccess(db.getUser()?.balance.toString())
+                    responseListener.onSuccess(it.body()!!.success.toString())
                 } else {
                     responseListener.onFailure("failed charge")
                     responseListener.onFailure(it.errorBody()?.string()!!.toString())

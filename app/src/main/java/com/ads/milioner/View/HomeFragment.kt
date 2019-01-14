@@ -1,12 +1,15 @@
 package com.ads.milioner.View
 
 import android.annotation.SuppressLint
+import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -24,6 +27,7 @@ import com.inmobi.ads.InMobiInterstitial
 import com.inmobi.ads.listeners.InterstitialAdEventListener
 import com.inmobi.sdk.InMobiSdk
 import com.jakewharton.rxbinding2.view.RxView
+import com.robinhood.ticker.TickerUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -78,7 +82,7 @@ class HomeFragment : Fragment() {
         viewModel.user = db.getUserLiveData()
         viewModel.user.observe(activity!!, Observer {
             if (it != null && tv_balance != null) {
-                tv_balance.text = it.balance.toString()
+                Handler(Looper.getMainLooper()).postDelayed({ tv_balance?.text = it.balance.toString() }, 1500)
                 Log.d(AppManager.TAG, "money :: " + it.balance.toString())
             }
         })
@@ -117,6 +121,10 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
+        tv_balance.setCharacterLists(TickerUtils.provideNumberList())
+        tv_balance.animationInterpolator = OvershootInterpolator()
+        tv_balance.animationDuration = 700
+        tv_balance.typeface = Typeface.createFromAsset(activity?.assets,"fonts/Vazir-Medium-FD.ttf")
 
         RxView.clicks(layout_show_ads).filter {
             pb_ads.visibility != View.VISIBLE
@@ -188,8 +196,12 @@ class HomeFragment : Fragment() {
                 override fun onSuccess(message: String) {
                     Log.d(AppManager.TAG, message)
                     when (message) {
-                        "true" -> Toast.makeText(activity, "شارژ با موفقیت انجام شد", Toast.LENGTH_SHORT).show()
-                        "false" -> Toast.makeText(activity, "موجودی شما کافی نمی‌باشد", Toast.LENGTH_SHORT).show()
+                        "true" -> {
+                            Toast.makeText(activity, "شارژ با موفقیت انجام شد", Toast.LENGTH_SHORT).show()
+                        }
+                        "false" -> {
+                            Toast.makeText(activity, "موجودی شما کافی نمی‌باشد", Toast.LENGTH_SHORT).show()
+                        }
                         else -> Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
                     }
                     pb_charge.visibility = View.INVISIBLE

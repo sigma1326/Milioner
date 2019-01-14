@@ -1,7 +1,6 @@
 package com.ads.milioner.Model
 
 import android.util.Log
-import android.widget.Toast
 import androidx.multidex.MultiDexApplication
 import androidx.room.Room
 import com.ads.milioner.Model.database.DataBase
@@ -22,7 +21,6 @@ import com.inmobi.sdk.InMobiSdk
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONException
 import org.json.JSONObject
-import org.koin.android.ext.android.inject
 import org.koin.android.ext.android.startKoin
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module.module

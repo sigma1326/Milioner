@@ -124,4 +124,5 @@ dependencies {
 
     api 'com.google.guava:guava:27.0.1-android'
 
+    implementation 'com.robinhood.ticker:ticker:2.0.1'
 }
