@@ -437,6 +437,7 @@ class HomeFragment : Fragment() {
             override fun onAdDisplayed(inMobiInterstitial: InMobiInterstitial?) {
                 super.onAdDisplayed(inMobiInterstitial)
                 Log.d(TAG, "onAdDisplayed 1" + inMobiInterstitial!!)
+                AppManager.isPlayingAd = true
                 updateState()
             }
 
@@ -461,6 +462,7 @@ class HomeFragment : Fragment() {
             override fun onRewardsUnlocked(inMobiInterstitial: InMobiInterstitial?, map: Map<Any, Any>?) {
                 super.onRewardsUnlocked(inMobiInterstitial, map)
                 Log.d(TAG, "onRewardsUnlocked 1 " + map!!.size)
+                AppManager.isPlayingAd = false
                 updateState()
                 (activity?.application as AppManager).callAdsAPI()
             }

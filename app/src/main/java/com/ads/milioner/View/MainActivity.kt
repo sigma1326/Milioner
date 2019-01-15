@@ -46,10 +46,12 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(message: String) {
-                    SweetAlertDialog(this@MainActivity, SweetAlertDialog.ERROR_TYPE)
-                        .setTitleText(message)
-                        .setConfirmText("باشه")
-                        .show()
+                    this@MainActivity.let {
+                        SweetAlertDialog(it, SweetAlertDialog.ERROR_TYPE)
+                            .setTitleText(message)
+                            .setConfirmText("باشه")
+                            .show()
+                    }
                 }
             })
         }
@@ -57,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         if (img_clear_data != null) {
             RxView.clicks(img_clear_data).subscribe {
                 this.let {
-                    SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                    SweetAlertDialog(it, SweetAlertDialog.WARNING_TYPE)
                         .setTitleText("پاک کردن اطلاعات برنامه")
                         .setContentText("آیا اطمینان دارید؟")
                         .setConfirmText("باشه")
