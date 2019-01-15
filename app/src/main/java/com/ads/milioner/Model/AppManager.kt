@@ -140,6 +140,7 @@ class AppManager : MultiDexApplication() {
         private const val DB_NAME = "milioner-db"
         var token = ""
         var phone: String = ""
+        var isPlayingAd = false
 
         val settings = InternetObservingSettings.builder()
             .initialInterval(1000)

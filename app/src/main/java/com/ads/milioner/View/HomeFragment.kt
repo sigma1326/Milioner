@@ -3,6 +3,7 @@ package com.ads.milioner.View
 import android.animation.Animator
 import android.annotation.SuppressLint
 import android.graphics.Typeface
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,7 +11,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
 import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -20,6 +20,7 @@ import com.ads.milioner.Model.AppManager
 import com.ads.milioner.Model.database.DataBaseRepositoryImpl
 import com.ads.milioner.Model.network.NetworkRepositoryImpl
 import com.ads.milioner.Model.network.model.ResponseListener
+import com.ads.milioner.R
 import com.ads.milioner.ViewModel.HomeViewModel
 import com.ads.milioner.ads.InterstitialFetcher
 import com.ads.milioner.ads.PlacementId
@@ -127,8 +128,11 @@ class HomeFragment : Fragment() {
         tv_balance.setCharacterLists(TickerUtils.provideNumberList())
         tv_balance.animationInterpolator = OvershootInterpolator()
         tv_balance.animationDuration = 1000
-        tv_balance.typeface = Typeface.createFromAsset(activity?.assets,"fonts/Vazir-Medium-FD.ttf")
-        tv_balance.removeAnimatorListener(object: Animator.AnimatorListener {
+        tv_balance.typeface = Typeface.createFromAsset(activity?.assets, "fonts/Vazir-Medium-FD.ttf")
+        val mp = MediaPlayer.create(activity, R.raw.coin)
+        mp.setVolume(100F, 100f)
+
+        tv_balance.addAnimatorListener(object : Animator.AnimatorListener {
             override fun onAnimationRepeat(animation: Animator?) {
             }
 
@@ -139,6 +143,7 @@ class HomeFragment : Fragment() {
             }
 
             override fun onAnimationStart(animation: Animator?) {
+                mp.start()
             }
         })
 
@@ -213,9 +218,11 @@ class HomeFragment : Fragment() {
 
     private fun playAds() {
         pb_ads.visibility = View.VISIBLE
-        setupInterstitial()
-        viewModel.mInterstitialAd?.load()
-        viewModel.mInterstitialAd?.show()
+        if (!AppManager.isPlayingAd) {
+            setupInterstitial()
+            viewModel.mInterstitialAd?.load()
+            viewModel.mInterstitialAd?.show()
+        }
     }
 
     private fun charge() {
@@ -344,6 +351,7 @@ class HomeFragment : Fragment() {
                 override fun onAdDisplayed(inMobiInterstitial: InMobiInterstitial?) {
                     super.onAdDisplayed(inMobiInterstitial)
                     Log.d(TAG, "onAdDisplayed " + inMobiInterstitial!!)
+                    AppManager.isPlayingAd = true
                     updateState()
 
                 }
@@ -370,6 +378,7 @@ class HomeFragment : Fragment() {
                     super.onRewardsUnlocked(inMobiInterstitial, map)
                     Log.d(TAG, "onRewardsUnlocked " + map!!.size)
                     updateState()
+                    AppManager.isPlayingAd = false
                     (activity?.application as AppManager).callAdsAPI()
                 }
             })
