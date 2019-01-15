@@ -72,7 +72,7 @@ class AppManager : MultiDexApplication() {
     }
 
 
-    fun initADS() {
+    private fun initADS() {
         val consent = JSONObject()
         try {
             // Provide correct consent value to sdk which is obtained by User

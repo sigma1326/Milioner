@@ -1,5 +1,6 @@
 package com.ads.milioner.View
 
+import android.animation.Animator
 import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.os.Bundle
@@ -9,6 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -28,6 +30,7 @@ import com.inmobi.ads.listeners.InterstitialAdEventListener
 import com.inmobi.sdk.InMobiSdk
 import com.jakewharton.rxbinding2.view.RxView
 import com.robinhood.ticker.TickerUtils
+import com.simorgh.sweetalertdialog.SweetAlertDialog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -123,8 +126,21 @@ class HomeFragment : Fragment() {
 
         tv_balance.setCharacterLists(TickerUtils.provideNumberList())
         tv_balance.animationInterpolator = OvershootInterpolator()
-        tv_balance.animationDuration = 700
+        tv_balance.animationDuration = 1000
         tv_balance.typeface = Typeface.createFromAsset(activity?.assets,"fonts/Vazir-Medium-FD.ttf")
+        tv_balance.removeAnimatorListener(object: Animator.AnimatorListener {
+            override fun onAnimationRepeat(animation: Animator?) {
+            }
+
+            override fun onAnimationEnd(animation: Animator?) {
+            }
+
+            override fun onAnimationCancel(animation: Animator?) {
+            }
+
+            override fun onAnimationStart(animation: Animator?) {
+            }
+        })
 
         RxView.clicks(layout_show_ads).filter {
             pb_ads.visibility != View.VISIBLE
@@ -134,7 +150,10 @@ class HomeFragment : Fragment() {
             if (isConnected) {
                 showAds()
             } else {
-                Toast.makeText(this.context, "دستگاه به اینترنت متصل نیست", Toast.LENGTH_SHORT).show()
+                SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("دستگاه به اینترنت متصل نیست")
+                    .setConfirmText("باشه")
+                    .show()
                 pb_ads.visibility = View.GONE
             }
         }
@@ -146,7 +165,10 @@ class HomeFragment : Fragment() {
             if (isConnected) {
                 charge()
             } else {
-                Toast.makeText(this.context, "دستگاه به اینترنت متصل نیست", Toast.LENGTH_SHORT).show()
+                SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("دستگاه به اینترنت متصل نیست")
+                    .setConfirmText("باشه")
+                    .show()
                 pb_charge.visibility = View.GONE
             }
         }
@@ -164,7 +186,10 @@ class HomeFragment : Fragment() {
                             playAds()
                         }
                         "false" -> {
-                            Toast.makeText(activity, "لطفا با VPN وصل شوید", Toast.LENGTH_SHORT).show()
+                            SweetAlertDialog(activity, SweetAlertDialog.WARNING_TYPE)
+                                .setTitleText("لطفا با VPN وصل شوید")
+                                .setConfirmText("باشه")
+                                .show()
                             updateState()
                         }
                         else -> {
@@ -176,7 +201,10 @@ class HomeFragment : Fragment() {
                 }
 
                 override fun onFailure(message: String) {
-                    Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+                    SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
+                        .setTitleText(message)
+                        .setConfirmText("باشه")
+                        .show()
                     updateState()
                 }
             })
@@ -197,19 +225,33 @@ class HomeFragment : Fragment() {
                     Log.d(AppManager.TAG, message)
                     when (message) {
                         "true" -> {
-                            Toast.makeText(activity, "شارژ با موفقیت انجام شد", Toast.LENGTH_SHORT).show()
+                            SweetAlertDialog(activity, SweetAlertDialog.SUCCESS_TYPE)
+                                .setTitleText("شارژ با موفقیت انجام شد")
+                                .setConfirmText("باشه")
+                                .show()
                         }
                         "false" -> {
-                            Toast.makeText(activity, "موجودی شما کافی نمی‌باشد", Toast.LENGTH_SHORT).show()
+                            SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
+                                .setTitleText("موجودی شما کافی نمی‌باشد")
+                                .setConfirmText("باشه")
+                                .show()
                         }
-                        else -> Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+                        else -> {
+                            SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
+                                .setTitleText(message)
+                                .setConfirmText("باشه")
+                                .show()
+                        }
                     }
                     pb_charge.visibility = View.INVISIBLE
                 }
 
                 override fun onFailure(message: String) {
                     Log.d(AppManager.TAG, message)
-                    Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+                    SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
+                        .setTitleText(message)
+                        .setConfirmText("باشه")
+                        .show()
                     pb_charge.visibility = View.INVISIBLE
                 }
 

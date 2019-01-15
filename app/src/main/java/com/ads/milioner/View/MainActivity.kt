@@ -3,13 +3,10 @@ package com.ads.milioner.View
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.ads.milioner.Model.AppManager
 import com.ads.milioner.Model.database.DataBaseRepositoryImpl
@@ -17,6 +14,7 @@ import com.ads.milioner.Model.network.NetworkRepositoryImpl
 import com.ads.milioner.Model.network.model.ResponseListener
 import com.ads.milioner.R
 import com.jakewharton.rxbinding2.view.RxView
+import com.simorgh.sweetalertdialog.SweetAlertDialog
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
@@ -48,30 +46,29 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(message: String) {
-                    Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
+                    SweetAlertDialog(this@MainActivity, SweetAlertDialog.ERROR_TYPE)
+                        .setTitleText(message)
+                        .setConfirmText("باشه")
+                        .show()
                 }
             })
         }
 
         if (img_clear_data != null) {
             RxView.clicks(img_clear_data).subscribe {
-                val builder: AlertDialog.Builder
                 this.let {
-                    builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        AlertDialog.Builder(it, android.R.style.Theme_Material_Dialog_Alert)
-                    } else {
-                        AlertDialog.Builder(it)
-                    }
-                    builder.setTitle("پاک کردن اطلاعات برنامه")
-                        .setMessage("آیا اطمینان دارید؟")
-                        .setPositiveButton("بله") { dialog, which ->
+                    SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                        .setTitleText("پاک کردن اطلاعات برنامه")
+                        .setContentText("آیا اطمینان دارید؟")
+                        .setConfirmText("باشه")
+                        .setCancelText("بی‌خیال")
+                        .setConfirmClickListener {
                             Handler(Looper.getMainLooper()).post {
                                 db.clearData()
-                                it.startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                                startActivity(Intent(this@MainActivity, LoginActivity::class.java))
                             }
+                            it.dismissWithAnimation()
                         }
-                        .setNegativeButton("خیر") { dialog, which -> }
-                        .setIcon(android.R.drawable.ic_dialog_alert)
                         .show()
                 }
             }
