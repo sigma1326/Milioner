@@ -18,4 +18,30 @@
     <string name="charge_sim_balance">خرید شارژ موبایل</string>
     <string name="charge_hint">با هر بار درخواست مقدار 1000 تومان از مبلغ موجودی شما کم و به ازای آن خط شما شارژ می‌گردد</string>
     <string name="resend">Resend</string>
+
+
+
+
+
+
+
+
+
+    <!-- Confirmation dialog-->
+    <string name="reset">Reset</string>
+    <string name="continue_game">Cancel</string>
+    <string name="reset_dialog_title">Reset game?</string>
+    <string name="reset_dialog_message">Are you sure you wish to reset the game?</string>
+
+    <string name="high_score">HIGH SCORE</string>
+    <string name="score">SCORE</string>
+    <string name="maxtile">MAX TILE</string>
+    <string name="timeText">ELAPSED TIME</string>
+    <string name="instructions">Join the numbers and get to the 2048 tile!</string>
+    <string name="you_win">You Win!</string>
+    <string name="game_over">Game Over!</string>
+    <string name="paused">Paused!</string>
+    <string name="go_on">Tap to Continue</string>
+    <string name="for_now">For now…</string>
+    <string name="endless">"Endless" Mode</string>
 </resources>
