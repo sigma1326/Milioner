@@ -93,7 +93,7 @@ dependencies {
     implementation 'android.arch.navigation:navigation-runtime-ktx:1.0.0-alpha09'
     implementation 'android.arch.navigation:navigation-testing-ktx:1.0.0-alpha06'
     implementation 'android.arch.navigation:navigation-ui-ktx:1.0.0-alpha09'
-    implementation 'android.arch.work:work-runtime-ktx:1.0.0-beta01'
+    implementation 'android.arch.work:work-runtime-ktx:1.0.0-beta02'
     // Room
     implementation 'androidx.room:room-runtime:2.1.0-alpha03'
     kapt "androidx.room:room-compiler:2.1.0-alpha03"
@@ -117,4 +117,10 @@ dependencies {
     api 'com.google.guava:guava:27.0.1-android'
     implementation 'com.robinhood.ticker:ticker:2.0.1'
     implementation project(':sweetalertdialog')
+
+
+
+
+    //country code picker
+    implementation  'com.github.mukeshsolanki:country-picker-android:2.0.1'
 }

@@ -13,11 +13,12 @@ import androidx.navigation.fragment.findNavController
 import com.ads.milioner.Model.AppManager
 import com.ads.milioner.Model.network.NetworkRepositoryImpl
 import com.ads.milioner.Model.network.model.ResponseListener
-import com.ads.milioner.R
 import com.ads.milioner.ViewModel.LoginViewModel
 import com.ads.milioner.util.CustomUtils
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
+import com.jakewharton.rxbinding2.view.RxView
 import com.jakewharton.rxbinding2.widget.RxTextView
+import com.mukesh.countrypicker.CountryPicker
 import com.transitionseverywhere.TransitionManager
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -60,7 +61,7 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.login_fragment, container, false)
+        return inflater.inflate(com.ads.milioner.R.layout.login_fragment, container, false)
     }
 
     @SuppressLint("CheckResult")
@@ -73,20 +74,42 @@ class LoginFragment : Fragment() {
             .skipInitialValue()
             .subscribe {
                 val text = view.et_code.text.toString()
-                if (text.length < 11 || text.isEmpty()) {
+                var max = 10
+
+                if (!view.countryCodeHolder.text.isEmpty()) {
+                    max = if (view.countryCodeHolder.text.toString() == "+98") {
+                        10
+                    } else {
+                        5
+                    }
+                }
+                if (text.length < max || text.isEmpty()) {
                     btn_login.isEnabled = false
                     btn_login.setTextColor(Color.parseColor("#A6A6A6"))
-                    btn_login.background = activity?.resources?.getDrawable(R.drawable.btn_disabled_bkg, null)
+                    btn_login.background =
+                            activity?.resources?.getDrawable(com.ads.milioner.R.drawable.btn_disabled_bkg, null)
                 } else {
                     btn_login.isEnabled = true
                     btn_login.setTextColor(Color.parseColor("#ffffff"))
-                    btn_login.background = activity?.resources?.getDrawable(R.drawable.button_bkg, null)
+                    btn_login.background =
+                            activity?.resources?.getDrawable(com.ads.milioner.R.drawable.button_bkg, null)
                 }
             }
 
+        RxView.clicks(view.countryCodeHolder!!).subscribe { _ ->
+            val builder = CountryPicker.Builder().with(activity!!)
+                .listener {
+                    view.countryCodeHolder.setText(it.dialCode.toString())
+                }
+            builder.build().showDialog(activity!!)
+        }
+
         view.btn_login.setOnClickListener { v ->
             CustomUtils.hideKeyboard(activity)
-            if (progressBar.visibility != View.VISIBLE) {
+            if (countryCodeHolder.text.isEmpty()) {
+                updateState("پیش شماره را نمی‌تواند خالی باشد", true)
+            }
+            else if (progressBar.visibility != View.VISIBLE) {
                 progressBar.visibility = View.VISIBLE
                 btn_login.text = ""
                 if (isConnected) {
@@ -100,12 +123,12 @@ class LoginFragment : Fragment() {
     }
 
     private fun login() {
-        network.register("98${et_code.text.toString().substring(1)}", object : ResponseListener {
+        network.register("${countryCodeHolder.text.substring(1)}${et_code.text.toString()}", object : ResponseListener {
             override fun onSuccess(message: String) {
                 Log.d(AppManager.TAG, message)
                 updateState(message, false)
 
-                findNavController().navigate(R.id.action_loginFragment_to_checkCodeFragment)
+                findNavController().navigate(com.ads.milioner.R.id.action_loginFragment_to_checkCodeFragment)
             }
 
             override fun onFailure(message: String) {
@@ -122,12 +145,12 @@ class LoginFragment : Fragment() {
             tv_error.text = message
             tv_error.visibility = View.VISIBLE
             progressBar.visibility = View.GONE
-            btn_login.text = activity?.getString(R.string.get_activation_code)
+            btn_login.text = activity?.getString(com.ads.milioner.R.string.get_activation_code)
         } else {
             tv_error.text = ""
             tv_error.visibility = View.GONE
             progressBar.visibility = View.GONE
-            btn_login.text = activity?.getString(R.string.get_activation_code)
+            btn_login.text = activity?.getString(com.ads.milioner.R.string.get_activation_code)
         }
     }
 
