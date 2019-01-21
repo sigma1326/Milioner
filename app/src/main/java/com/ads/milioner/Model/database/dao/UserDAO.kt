@@ -1,5 +1,6 @@
 package com.ads.milioner.Model.database.dao
 
+import androidx.annotation.Keep
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
@@ -7,6 +8,7 @@ import com.ads.milioner.Model.database.model.User
 
 
 @Dao
+@Keep
 interface UserDAO {
     @Query("SELECT * from user where user_id=1 ")
     fun getUserLiveData(): LiveData<User>

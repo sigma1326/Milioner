@@ -1,11 +1,12 @@
 package com.ads.milioner.Model.network
 
+import androidx.annotation.Keep
 import com.ads.milioner.Model.network.model.*
 import io.reactivex.Observable
 import retrofit2.Response
 import retrofit2.http.*
 
-
+@Keep
 interface ApiService {
 
     @POST("/users/register/")

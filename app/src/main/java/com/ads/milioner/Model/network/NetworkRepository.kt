@@ -1,7 +1,9 @@
 package com.ads.milioner.Model.network
 
+import androidx.annotation.Keep
 import com.ads.milioner.Model.network.model.ResponseListener
 
+@Keep
 interface NetworkRepository {
     fun login(phone: String, code: String, responseListener: ResponseListener)
     fun register(phone: String, responseListener: ResponseListener)

@@ -46,7 +46,7 @@ class AppManager : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
 
-//        getUncaughtExceptions()
+        getUncaughtExceptions()
 
         Stetho.initializeWithDefaults(this)
 

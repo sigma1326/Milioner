@@ -1,10 +1,12 @@
 package com.ads.milioner.Model.database
 
+import androidx.annotation.Keep
 import androidx.lifecycle.LiveData
 import com.ads.milioner.Model.database.model.User
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 
+@Keep
 class DataBaseRepositoryImpl(private val db: DataBase) : DataBaseRepository {
     override fun updateBalance(balance: Long) {
         GlobalScope.async {

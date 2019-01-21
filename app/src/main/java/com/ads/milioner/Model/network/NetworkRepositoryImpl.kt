@@ -2,6 +2,7 @@ package com.ads.milioner.Model.network
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.annotation.Keep
 import com.ads.milioner.Model.AppManager
 import com.ads.milioner.Model.database.DataBaseRepositoryImpl
 import com.ads.milioner.Model.database.model.User
@@ -9,6 +10,7 @@ import com.ads.milioner.Model.network.model.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 @SuppressLint("CheckResult")
+@Keep
 class NetworkRepositoryImpl(private val apiService: ApiService, private val db: DataBaseRepositoryImpl) :
     NetworkRepository {
     override fun refresh(token: String, responseListener: ResponseListener) {
