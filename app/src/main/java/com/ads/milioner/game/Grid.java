@@ -1,7 +1,10 @@
 package com.ads.milioner.game;
 
+import androidx.annotation.Keep;
+
 import java.util.ArrayList;
 
+@Keep
 public class Grid {
 
     public final Tile[][] field;

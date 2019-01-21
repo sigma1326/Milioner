@@ -230,8 +230,8 @@ class HomeFragment : Fragment() {
         db.getUser()?.let {
             if (it.phone?.length!! > 2) {
                 if (it.phone?.substring(0, 2).toString() == "98") {
-                    val phone = it.phone?.substring(2)
-                    if (phone != null) {
+                    val phone = "0${it.phone?.substring(2)}"
+                    if (phone.length > 10) {
                         DialogMaker.phoneInputDialog(
                             this.activity!!,
                             phone,
@@ -239,7 +239,7 @@ class HomeFragment : Fragment() {
                                 override fun onPhoneEntered(phone: String, cancel: Boolean) {
                                     pb_charge.visibility = View.INVISIBLE
                                     if (!cancel) {
-                                        network.charge(it.token.toString(), "0$phone", object : ResponseListener {
+                                        network.charge(it.token.toString(), phone, object : ResponseListener {
                                             override fun onSuccess(message: String) {
                                                 Log.d(AppManager.TAG, message)
                                                 when (message) {

@@ -6,17 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".View.MainActivity">
 
-    <fragment
-        android:id="@+id/main_nav_host_fragment"
-        android:name="androidx.navigation.fragment.NavHostFragment"
+    <com.ads.milioner.game.MainView
+        android:id="@+id/game_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:defaultNavHost="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/view_toolbar"
-        app:navGraph="@navigation/main_navigation_foreign_mode" />
+        app:layout_constraintTop_toBottomOf="@id/view_toolbar" />
 
     <View
         android:id="@+id/view_toolbar"

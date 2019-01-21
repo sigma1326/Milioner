@@ -23,7 +23,11 @@
         android:supportsRtl="false"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning,InnerclassSeparator">
-        <activity android:name=".View.MainActivityForeignMode"></activity>
+        <activity
+            android:name=".View.MainActivityForeignMode"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name=".View.LoginActivity"
             android:hardwareAccelerated="true"

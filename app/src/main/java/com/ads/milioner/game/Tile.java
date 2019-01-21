@@ -1,5 +1,8 @@
 package com.ads.milioner.game;
 
+import androidx.annotation.Keep;
+
+@Keep
 public class Tile extends Cell {
     private final int value;
     private Tile[] mergedFrom = null;

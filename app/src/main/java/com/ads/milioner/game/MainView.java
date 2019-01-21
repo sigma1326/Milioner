@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import androidx.annotation.Keep;
 import com.ads.milioner.R;
 import com.ads.milioner.View.MainActivityForeignMode;
 
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 @SuppressWarnings("deprecation")
+@Keep
 public class MainView extends View {
     private OnGameEndedListener onGameEndedListener;
 

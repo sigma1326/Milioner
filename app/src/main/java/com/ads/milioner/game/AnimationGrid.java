@@ -1,8 +1,11 @@
 package com.ads.milioner.game;
 
+import androidx.annotation.Keep;
+
 import java.util.ArrayList;
 
 
+@Keep
 public class AnimationGrid {
     public final ArrayList<AnimationCell> globalAnimation = new ArrayList<>();
     private final ArrayList<AnimationCell>[][] field;

@@ -3,12 +3,14 @@ package com.ads.milioner.game;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import androidx.annotation.Keep;
 import com.ads.milioner.View.MainActivityForeignMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Keep
 public class MainGame {
 
     private MainView.OnGameEndedListener onGameEndedListener;

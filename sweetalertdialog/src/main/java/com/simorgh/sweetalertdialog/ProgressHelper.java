@@ -1,10 +1,10 @@
 package com.simorgh.sweetalertdialog;
 
 import android.content.Context;
-
+import androidx.annotation.Keep;
 import com.simorgh.materialishprogress.ProgressWheel;
 
-
+@Keep
 public class ProgressHelper {
     private ProgressWheel mProgressWheel;
     private boolean mToSpin;

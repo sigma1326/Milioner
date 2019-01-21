@@ -1,5 +1,9 @@
 package com.ads.milioner.game;
 
+
+import androidx.annotation.Keep;
+
+@Keep
 class AnimationCell extends Cell {
     public final int[] extras;
     private final int animationType;

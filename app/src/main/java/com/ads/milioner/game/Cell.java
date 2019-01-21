@@ -1,5 +1,8 @@
 package com.ads.milioner.game;
 
+import androidx.annotation.Keep;
+
+@Keep
 public class Cell {
     private int x;
     private int y;

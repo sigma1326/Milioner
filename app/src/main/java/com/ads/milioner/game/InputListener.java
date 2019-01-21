@@ -3,10 +3,12 @@ package com.ads.milioner.game;
 import android.annotation.SuppressLint;
 import android.view.MotionEvent;
 import android.view.View;
+import androidx.annotation.Keep;
 import com.ads.milioner.R;
 import com.ads.milioner.View.MainActivityForeignMode;
 import com.simorgh.sweetalertdialog.SweetAlertDialog;
 
+@Keep
 class InputListener implements View.OnTouchListener {
 
     private static final int SWIPE_MIN_DISTANCE = 0;

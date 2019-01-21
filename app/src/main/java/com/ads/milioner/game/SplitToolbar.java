@@ -4,12 +4,14 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.annotation.Keep;
 import androidx.appcompat.widget.ActionMenuView;
 import androidx.appcompat.widget.Toolbar;
 
 /**
  * Created by AarKay
  */
+@Keep
 public class SplitToolbar extends Toolbar {
 
     public SplitToolbar(Context context) {

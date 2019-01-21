@@ -15,8 +15,10 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.annotation.Keep;
 import com.simorgh.materialishprogress.ProgressWheel;
 
+@Keep
 public class SweetAlertDialog extends Dialog implements View.OnClickListener {
     private View mDialogView;
     private AnimationSet mModalInAnim;
