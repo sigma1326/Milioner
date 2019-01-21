@@ -12,7 +12,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import com.ads.milioner.R;
-import com.ads.milioner.View.MainActivity;
+import com.ads.milioner.View.MainActivityForeignMode;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -496,7 +496,7 @@ public class MainView extends View {
             displayOverlay.setAlpha((int) (255 * alphaChange));
             displayOverlay.draw(canvas);
         }
-        MainActivity.running = false;
+        MainActivityForeignMode.running = false;
     }
 
     private void drawPauseState(Canvas canvas) {
@@ -512,7 +512,7 @@ public class MainView extends View {
             displayOverlay.setAlpha((int) (255 * alphaChange));
             displayOverlay.draw(canvas);
         }
-        MainActivity.running = false;
+        MainActivityForeignMode.running = false;
     }
 
     private void drawEndlessText(Canvas canvas) {

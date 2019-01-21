@@ -7,8 +7,6 @@ import com.ads.milioner.Model.database.DataBaseRepositoryImpl
 import com.ads.milioner.Model.database.model.User
 import com.ads.milioner.Model.network.model.*
 import io.reactivex.android.schedulers.AndroidSchedulers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 
 @SuppressLint("CheckResult")
 class NetworkRepositoryImpl(private val apiService: ApiService, private val db: DataBaseRepositoryImpl) :
@@ -85,8 +83,8 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
             })
     }
 
-    override fun charge(token: String, responseListener: ResponseListener) {
-        apiService.charge("jwt $token")
+    override fun charge(token: String, phone: String, responseListener: ResponseListener) {
+        apiService.charge("jwt $token", phone)
             .subscribeOn(io.reactivex.schedulers.Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({

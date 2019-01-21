@@ -21,13 +21,28 @@ class LoginActivity : AppCompatActivity() {
         if (user == null) {
             setContentView(R.layout.activity_login)
         } else {
-            if (user.token.equals("")) {
-                setContentView(R.layout.activity_login)
-            } else {
-                this.finish()
-                startActivity(Intent(this, MainActivity::class.java))
+            user.phone?.let {
+                if (!it.isEmpty() && it.length > 2) {
+                    if (it.substring(0, 2) == "98") {
+                        startNormalMode()
+                    } else {
+                        startForeignMode()
+                    }
+                } else {
+                    startForeignMode()
+                }
             }
         }
+    }
+
+    private fun startForeignMode() {
+        this.finish()
+        startActivity(Intent(this, MainActivityForeignMode::class.java))
+    }
+
+    private fun startNormalMode() {
+        this.finish()
+        startActivity(Intent(this, MainActivity::class.java))
     }
 
     override fun onSupportNavigateUp(): Boolean {

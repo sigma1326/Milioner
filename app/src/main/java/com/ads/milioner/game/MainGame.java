@@ -3,7 +3,7 @@ package com.ads.milioner.game;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import com.ads.milioner.View.MainActivity;
+import com.ads.milioner.View.MainActivityForeignMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,7 +76,7 @@ public class MainGame {
             recordMaxTile();
             maxTile = getMaxTile();
         }
-        MainActivity.running = true;
+        MainActivityForeignMode.running = true;
         canUndo = false;
         paused = false;
         score = 0;
@@ -164,7 +164,7 @@ public class MainGame {
 
     public void revertUndoState() {
         if (canUndo) {
-            MainActivity.running = true;
+            MainActivityForeignMode.running = true;
             canUndo = false;
             aGrid.cancelAnimations();
             grid.revertTiles();
@@ -269,7 +269,7 @@ public class MainGame {
     }
 
     private void endGame() {
-        MainActivity.running = false;
+        MainActivityForeignMode.running = false;
         aGrid.startAnimation(-1, -1, FADE_GLOBAL_ANIMATION, NOTIFICATION_ANIMATION_TIME, NOTIFICATION_DELAY_TIME, null);
         if (score >= highScore) {
             highScore = score;
@@ -386,11 +386,11 @@ public class MainGame {
 
     public void pausePlay() {
         if (!paused && mView.game.isActive()) {
-            MainActivity.running = false;
+            MainActivityForeignMode.running = false;
             paused = true;
         } else {
             paused = false;
-            MainActivity.running = true;
+            MainActivityForeignMode.running = true;
         }
         mView.invalidate();
     }

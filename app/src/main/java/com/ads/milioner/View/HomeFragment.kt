@@ -24,6 +24,7 @@ import com.ads.milioner.R
 import com.ads.milioner.ViewModel.HomeViewModel
 import com.ads.milioner.ads.InterstitialFetcher
 import com.ads.milioner.ads.PlacementId
+import com.ads.milioner.util.DialogMaker
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import com.inmobi.ads.InMobiAdRequestStatus
 import com.inmobi.ads.InMobiInterstitial
@@ -226,48 +227,67 @@ class HomeFragment : Fragment() {
     }
 
     private fun charge() {
-        db.getUser().let {
-            network.charge(it?.token.toString(), object : ResponseListener {
-                override fun onSuccess(message: String) {
-                    Log.d(AppManager.TAG, message)
-                    when (message) {
-                        "true" -> {
-                            SweetAlertDialog(activity, SweetAlertDialog.SUCCESS_TYPE)
-                                .setTitleText("شارژ با موفقیت انجام شد")
-                                .setConfirmText("باشه")
-                                .show()
-                        }
-                        "false" -> {
-                            SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
-                                .setTitleText("موجودی شما کافی نمی‌باشد")
-                                .setConfirmText("باشه")
-                                .show()
-                        }
-                        else -> {
-                            SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
-                                .setTitleText(message)
-                                .setConfirmText("باشه")
-                                .show()
-                        }
+        db.getUser()?.let {
+            if (it.phone?.length!! > 2) {
+                if (it.phone?.substring(0, 2).toString() == "98") {
+                    val phone = it.phone?.substring(2)
+                    if (phone != null) {
+                        DialogMaker.phoneInputDialog(
+                            this.activity!!,
+                            phone,
+                            object : DialogMaker.OnPhoneEnteredListener {
+                                override fun onPhoneEntered(phone: String, cancel: Boolean) {
+                                    pb_charge.visibility = View.INVISIBLE
+                                    if (!cancel) {
+                                        network.charge(it.token.toString(), "0$phone", object : ResponseListener {
+                                            override fun onSuccess(message: String) {
+                                                Log.d(AppManager.TAG, message)
+                                                when (message) {
+                                                    "true" -> {
+                                                        SweetAlertDialog(activity, SweetAlertDialog.SUCCESS_TYPE)
+                                                            .setTitleText("شارژ با موفقیت انجام شد")
+                                                            .setConfirmText("باشه")
+                                                            .show()
+                                                    }
+                                                    "false" -> {
+                                                        SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
+                                                            .setTitleText("موجودی شما کافی نمی‌باشد")
+                                                            .setConfirmText("باشه")
+                                                            .show()
+                                                    }
+                                                    "null" -> {
+                                                        SweetAlertDialog(activity, SweetAlertDialog.NORMAL_TYPE)
+                                                            .setTitleText("درخواست شما بررسی می‌شود")
+                                                            .setConfirmText("باشه")
+                                                            .show()
+                                                    }
+                                                    else -> {
+                                                        SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
+                                                            .setTitleText(message)
+                                                            .setConfirmText("باشه")
+                                                            .show()
+                                                    }
+                                                }
+                                                pb_charge.visibility = View.INVISIBLE
+                                            }
+
+                                            override fun onFailure(message: String) {
+                                                Log.d(AppManager.TAG, message)
+                                                SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
+                                                    .setTitleText(message)
+                                                    .setConfirmText("باشه")
+                                                    .show()
+                                                pb_charge.visibility = View.INVISIBLE
+                                            }
+
+                                        })
+                                    }
+                                }
+                            })
                     }
-                    pb_charge.visibility = View.INVISIBLE
                 }
-
-                override fun onFailure(message: String) {
-                    Log.d(AppManager.TAG, message)
-                    SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
-                        .setTitleText(message)
-                        .setConfirmText("باشه")
-                        .show()
-                    pb_charge.visibility = View.INVISIBLE
-                }
-
-            })
+            }
         }
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
     }
 
     private fun initAds() {
@@ -437,7 +457,6 @@ class HomeFragment : Fragment() {
             override fun onAdDisplayed(inMobiInterstitial: InMobiInterstitial?) {
                 super.onAdDisplayed(inMobiInterstitial)
                 Log.d(TAG, "onAdDisplayed 1" + inMobiInterstitial!!)
-                AppManager.isPlayingAd = true
                 updateState()
             }
 
@@ -462,7 +481,6 @@ class HomeFragment : Fragment() {
             override fun onRewardsUnlocked(inMobiInterstitial: InMobiInterstitial?, map: Map<Any, Any>?) {
                 super.onRewardsUnlocked(inMobiInterstitial, map)
                 Log.d(TAG, "onRewardsUnlocked 1 " + map!!.size)
-                AppManager.isPlayingAd = false
                 updateState()
                 (activity?.application as AppManager).callAdsAPI()
             }

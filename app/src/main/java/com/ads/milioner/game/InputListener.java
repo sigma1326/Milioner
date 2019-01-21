@@ -1,14 +1,10 @@
 package com.ads.milioner.game;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.os.Looper;
 import android.view.MotionEvent;
 import android.view.View;
 import com.ads.milioner.R;
-import com.ads.milioner.View.LoginActivity;
-import com.ads.milioner.View.MainActivity;
+import com.ads.milioner.View.MainActivityForeignMode;
 import com.simorgh.sweetalertdialog.SweetAlertDialog;
 
 class InputListener implements View.OnTouchListener {
@@ -127,7 +123,7 @@ class InputListener implements View.OnTouchListener {
                 //"Menu" inputs
                 if (!hasMoved) {
                     if (iconPressed(mView.sXNewGame, mView.sYIcons)) {
-                        MainActivity.running = false;
+                        MainActivityForeignMode.running = false;
                         if (!mView.game.gameLost()) {
                             new SweetAlertDialog(mView.getContext(), SweetAlertDialog.WARNING_TYPE)
                                     .setTitleText(mView.getContext().getString(R.string.reset_dialog_title))
@@ -140,7 +136,7 @@ class InputListener implements View.OnTouchListener {
                                     })
                                     .setCancelClickListener(sweetAlertDialog -> {
                                         sweetAlertDialog.dismissWithAnimation();
-                                        MainActivity.running = true;
+                                        MainActivityForeignMode.running = true;
                                     })
                                     .show();
                         } else {

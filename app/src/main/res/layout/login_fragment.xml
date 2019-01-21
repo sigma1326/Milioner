@@ -70,34 +70,47 @@
         android:hint="@string/eg_0912"
         android:inputType="phone"
         android:lines="1"
-        android:maxLength="11"
+        android:longClickable="false"
+        android:maxLength="10"
         android:padding="10dp"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/btn_login"
         app:layout_constraintEnd_toEndOf="@+id/btn_login"
         app:layout_constraintHorizontal_weight="2.5"
-        app:layout_constraintStart_toEndOf="@id/countryCodeHolder"
+        app:layout_constraintStart_toEndOf="@id/cc"
         app:layout_constraintTop_toBottomOf="@+id/tv_hint"
         app:layout_constraintVertical_bias="1.0" />
 
-    <EditText
-        android:id="@+id/countryCodeHolder"
+    <FrameLayout
+        android:id="@+id/cc"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginEnd="8dp"
+        android:layout_height="wrap_content"
         android:background="@drawable/edittext_bkg"
-        android:gravity="center"
-        android:hint="+98"
-        android:inputType="number"
-        android:lines="1"
-        android:text="+98"
-        android:textAlignment="center"
-        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@id/et_code"
         app:layout_constraintEnd_toStartOf="@id/et_code"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="@id/btn_login"
-        app:layout_constraintTop_toTopOf="@id/et_code" />
+        app:layout_constraintTop_toTopOf="@id/et_code">
+
+        <TextView
+            android:id="@+id/countryCodeHolder"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="8dp"
+            android:drawableEnd="@drawable/ic_arrow_drop_down_black_24dp"
+            android:drawablePadding="5dp"
+            android:gravity="center"
+            android:lines="1"
+            android:longClickable="false"
+            android:padding="8dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="0dp"
+            android:text="+1"
+            android:textAlignment="center"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tv_error"
@@ -132,6 +145,18 @@
         app:layout_constraintEnd_toEndOf="@+id/btn_login"
         app:layout_constraintStart_toStartOf="@+id/btn_login"
         app:layout_constraintTop_toTopOf="@+id/btn_login" />
+
+    <TextView
+        android:id="@+id/tv_country"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="Country"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/cc"
+        app:layout_constraintEnd_toEndOf="@+id/cc"
+        app:layout_constraintStart_toStartOf="@+id/cc" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

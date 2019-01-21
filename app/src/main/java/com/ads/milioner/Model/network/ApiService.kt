@@ -24,8 +24,9 @@ interface ApiService {
     fun refresh(@Field("token") token: String): Observable<Response<RefreshResponse>>
 
 
-    @GET("/api/charge/")
-    fun charge(@Header("Authorization") authorization: String): Observable<Response<ChargeResponse>>
+    @POST("/api/charge-req/")
+    @FormUrlEncoded
+    fun charge(@Header("Authorization") authorization: String, @Field("phone") phone: String): Observable<Response<ChargeResponse>>
 
     @GET("/api/check-ip/")
     fun checkIP(): Observable<Response<CheckIPResponse>>

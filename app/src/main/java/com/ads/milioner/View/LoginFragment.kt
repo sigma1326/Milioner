@@ -1,6 +1,7 @@
 package com.ads.milioner.View
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.ads.milioner.Model.AppManager
+import com.ads.milioner.Model.database.DataBaseRepositoryImpl
+import com.ads.milioner.Model.database.model.User
 import com.ads.milioner.Model.network.NetworkRepositoryImpl
 import com.ads.milioner.Model.network.model.ResponseListener
 import com.ads.milioner.ViewModel.LoginViewModel
@@ -30,13 +33,12 @@ import org.koin.android.ext.android.inject
 
 class LoginFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = LoginFragment()
-    }
+    private val network: NetworkRepositoryImpl by inject()
+    private val db: DataBaseRepositoryImpl by inject()
+
 
     private lateinit var viewModel: LoginViewModel
 
-    private val network: NetworkRepositoryImpl by inject()
 
     lateinit var disposable: Disposable
     var isConnected = false
@@ -55,6 +57,9 @@ class LoginFragment : Fragment() {
             .subscribe {
                 isConnected = it
             }
+
+        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+
     }
 
     override fun onCreateView(
@@ -69,6 +74,8 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         TransitionManager.beginDelayedTransition((view as ViewGroup?)!!)
+
+        countryCodeHolder.text = viewModel.countryCode
 
         RxTextView.afterTextChangeEvents(view.et_code!!)
             .skipInitialValue()
@@ -96,10 +103,11 @@ class LoginFragment : Fragment() {
                 }
             }
 
-        RxView.clicks(view.countryCodeHolder!!).subscribe { _ ->
+        RxView.clicks(view.countryCodeHolder!!).subscribe {
             val builder = CountryPicker.Builder().with(activity!!)
                 .listener {
-                    view.countryCodeHolder.setText(it.dialCode.toString())
+                    view.countryCodeHolder.text = it.dialCode.toString()
+                    viewModel.countryCode = it.dialCode.toString()
                 }
             builder.build().showDialog(activity!!)
         }
@@ -108,8 +116,7 @@ class LoginFragment : Fragment() {
             CustomUtils.hideKeyboard(activity)
             if (countryCodeHolder.text.isEmpty()) {
                 updateState("پیش شماره را نمی‌تواند خالی باشد", true)
-            }
-            else if (progressBar.visibility != View.VISIBLE) {
+            } else if (progressBar.visibility != View.VISIBLE) {
                 progressBar.visibility = View.VISIBLE
                 btn_login.text = ""
                 if (isConnected) {
@@ -123,20 +130,38 @@ class LoginFragment : Fragment() {
     }
 
     private fun login() {
-        network.register("${countryCodeHolder.text.substring(1)}${et_code.text.toString()}", object : ResponseListener {
-            override fun onSuccess(message: String) {
-                Log.d(AppManager.TAG, message)
-                updateState(message, false)
+        if (countryCodeHolder.text.substring(1) == "98") {
+            network.register("${countryCodeHolder.text.substring(1)}${et_code.text}", object : ResponseListener {
+                override fun onSuccess(message: String) {
+                    Log.d(AppManager.TAG, message)
+                    updateState(message, false)
 
-                findNavController().navigate(com.ads.milioner.R.id.action_loginFragment_to_checkCodeFragment)
+                    findNavController().navigate(com.ads.milioner.R.id.action_loginFragment_to_checkCodeFragment)
+                }
+
+                override fun onFailure(message: String) {
+                    Log.d(AppManager.TAG, message)
+                    updateState(message, true)
+                }
+
+            })
+        } else {
+            updateState("", false)
+            db.clearData()
+            var user = db.getUser()
+            if (user == null) {
+                user = User(
+                    userID = 1,
+                    phone = et_code.text.toString(),
+                    balance = 0,
+                    token = ""
+                )
+                db.insertUser(user)
             }
+            activity?.finish()
+            activity?.startActivity(Intent(activity, MainActivityForeignMode::class.java))
+        }
 
-            override fun onFailure(message: String) {
-                Log.d(AppManager.TAG, message)
-                updateState(message, true)
-            }
-
-        })
 
     }
 
@@ -156,7 +181,6 @@ class LoginFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
     }
 
 }

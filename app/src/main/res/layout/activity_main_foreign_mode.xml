@@ -35,7 +35,7 @@
         android:elevation="5dp"
         android:fontFamily="@font/vazir_medium"
         android:gravity="center"
-        android:text="@string/milioner_farsi"
+        android:text="@string/milioner_english"
         android:textColor="#ffffff"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@+id/view_toolbar"

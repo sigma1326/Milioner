@@ -5,8 +5,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -30,7 +28,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.check_code_fragment.*
 import kotlinx.android.synthetic.main.check_code_fragment.view.*
-import kotlinx.coroutines.GlobalScope
 import org.koin.android.ext.android.inject
 
 @SuppressLint("CheckResult")
@@ -204,6 +201,9 @@ class CheckCodeFragment : Fragment() {
 
     private fun updateState(message: String, isError: Boolean) {
         try {
+            if (tv_error == null) {
+                return
+            }
             if (isError) {
                 tv_error.text = message
                 tv_error.visibility = View.VISIBLE

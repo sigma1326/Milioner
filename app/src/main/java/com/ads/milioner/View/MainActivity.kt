@@ -64,12 +64,13 @@ class MainActivity : AppCompatActivity() {
                         .setContentText("آیا اطمینان دارید؟")
                         .setConfirmText("باشه")
                         .setCancelText("بی‌خیال")
-                        .setConfirmClickListener {
+                        .setConfirmClickListener { sad ->
                             Handler(Looper.getMainLooper()).post {
                                 db.clearData()
+                                this@MainActivity.finish()
                                 startActivity(Intent(this@MainActivity, LoginActivity::class.java))
                             }
-                            it.dismissWithAnimation()
+                            sad.dismissWithAnimation()
                         }
                         .show()
                 }
@@ -82,6 +83,5 @@ class MainActivity : AppCompatActivity() {
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase))
     }
-
 
 }

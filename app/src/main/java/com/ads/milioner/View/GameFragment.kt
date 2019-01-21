@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -17,20 +16,15 @@ import com.ads.milioner.Model.database.DataBaseRepositoryImpl
 import com.ads.milioner.Model.network.NetworkRepositoryImpl
 import com.ads.milioner.Model.network.model.ResponseListener
 import com.ads.milioner.R
-import com.ads.milioner.View.MainActivity.Companion.running
+import com.ads.milioner.View.MainActivityForeignMode.Companion.running
 import com.ads.milioner.ViewModel.GameViewModel
 import com.ads.milioner.ads.InterstitialFetcher
 import com.ads.milioner.ads.PlacementId
 import com.ads.milioner.game.Tile
-import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import com.inmobi.ads.InMobiAdRequestStatus
 import com.inmobi.ads.InMobiInterstitial
 import com.inmobi.ads.listeners.InterstitialAdEventListener
 import com.inmobi.sdk.InMobiSdk
-import com.simorgh.sweetalertdialog.SweetAlertDialog
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.game_fragment.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -58,8 +52,6 @@ class GameFragment : Fragment() {
     private val TAG = AppManager.TAG
     private val mHandler = Handler()
 
-    lateinit var disposable: Disposable
-    var isConnected = false
     private lateinit var viewModel: GameViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,14 +87,6 @@ class GameFragment : Fragment() {
         t.start()
 
 
-        disposable = ReactiveNetwork
-            .observeInternetConnectivity(AppManager.settings)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                isConnected = it
-            }
-
     }
 
 
@@ -121,14 +105,7 @@ class GameFragment : Fragment() {
 
 
         game_view?.setOnGameEndedListener {
-            if (isConnected) {
-                showAds()
-            } else {
-                SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
-                    .setTitleText("دستگاه به اینترنت متصل نیست")
-                    .setConfirmText("باشه")
-                    .show()
-            }
+            showAds()
         }
     }
 
@@ -140,19 +117,18 @@ class GameFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        save()
+//        save()
         running = false
     }
 
     override fun onResume() {
         super.onResume()
-        load()
+//        load()
         running = true
     }
 
     override fun onStart() {
         super.onStart()
-        Log.d(AppManager.TAG, "start")
         viewModel = ViewModelProviders.of(this).get(GameViewModel::class.java)
         viewModel.user = db.getUserLiveData()
         viewModel.user.observe(activity!!, Observer {
@@ -190,7 +166,6 @@ class GameFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        disposable.dispose()
         super.onDestroy()
     }
 
@@ -263,37 +238,8 @@ class GameFragment : Fragment() {
 
 
     private fun showAds() {
-        db.getUser().let {
-            network.checkIP(object : ResponseListener {
-                override fun onSuccess(message: String) {
-                    when (message) {
-                        "true" -> {
-                            playAds()
-                        }
-                        "false" -> {
-                            SweetAlertDialog(activity, SweetAlertDialog.WARNING_TYPE)
-                                .setTitleText("لطفا با VPN وصل شوید")
-                                .setConfirmText("باشه")
-                                .show()
-                            updateState()
-                        }
-                        else -> {
-                            Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
-                            updateState()
-                        }
-                    }
-
-                }
-
-                override fun onFailure(message: String) {
-                    SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
-                        .setTitleText(message)
-                        .setConfirmText("باشه")
-                        .show()
-                    updateState()
-                }
-            })
-        }
+        updateState()
+        playAds()
     }
 
     private fun playAds() {
