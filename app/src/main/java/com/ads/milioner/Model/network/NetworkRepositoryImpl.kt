@@ -92,9 +92,13 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
                     Log.d(AppManager.TAG, it.body()!!.success.toString())
                     Log.d(AppManager.TAG, it.body()!!.money.toString())
 
-                    it.body()!!.money?.let { it1 -> db.updateBalance(it1) }
+                    if (it.body()!!.success == null) {
+                        responseListener.onSuccess("null")
+                    } else {
+                        it.body()!!.money?.let { it1 -> db.updateBalance(it1) }
 
-                    responseListener.onSuccess(it.body()!!.success.toString())
+                        responseListener.onSuccess(it.body()!!.success.toString())
+                    }
                 } else {
                     responseListener.onFailure("failed charge")
                     responseListener.onFailure(it.errorBody()?.string()!!.toString())
