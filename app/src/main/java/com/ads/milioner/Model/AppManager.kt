@@ -135,7 +135,7 @@ class AppManager : MultiDexApplication() {
 
 
     companion object {
-        private const val host = "https://apanaj.fdli.ir"
+        private const val host = "https://apanaj.erichclub.com"
         const val TAG = "debug"
         private const val DB_NAME = "milioner-db"
         var token = ""

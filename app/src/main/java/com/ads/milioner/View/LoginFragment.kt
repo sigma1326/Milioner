@@ -112,7 +112,7 @@ class LoginFragment : Fragment() {
             builder.build().showDialog(activity!!)
         }
 
-        view.btn_login.setOnClickListener { v ->
+        view.btn_login.setOnClickListener {
             CustomUtils.hideKeyboard(activity)
             if (countryCodeHolder.text.isEmpty()) {
                 updateState("پیش شماره را نمی‌تواند خالی باشد", true)

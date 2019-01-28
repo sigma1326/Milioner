@@ -217,3 +217,12 @@
 -keep class com.google.apphosting.api.ApiProxy {
   static *** getCurrentEnvironment (...);
 }
+
+
+# For communication with AdColony's WebView
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
+# For removing warnings due to lack of Multi-Window support
+-dontwarn android.app.Activity

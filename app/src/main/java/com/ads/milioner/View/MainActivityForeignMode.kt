@@ -10,10 +10,10 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.adcolony.sdk.*
 import com.ads.milioner.Model.AppManager
 import com.ads.milioner.Model.database.DataBaseRepositoryImpl
 import com.ads.milioner.Model.network.NetworkRepositoryImpl
-import com.ads.milioner.Model.network.model.ResponseListener
 import com.ads.milioner.R
 import com.ads.milioner.ViewModel.GameViewModel
 import com.ads.milioner.ads.InterstitialFetcher
@@ -51,6 +51,11 @@ class MainActivityForeignMode : AppCompatActivity() {
 
     private val TAG = AppManager.TAG
     private val mHandler = Handler()
+
+
+    private lateinit var ad: AdColonyInterstitial
+    private lateinit var listener: AdColonyInterstitialListener
+    private lateinit var adOptions: AdColonyAdOptions
 
     private lateinit var viewModel: GameViewModel
 
@@ -124,6 +129,84 @@ class MainActivityForeignMode : AppCompatActivity() {
                 }
             }
         }
+
+
+        // Construct optional app options object to be sent with configure
+        val appOptions = AdColonyAppOptions()
+            .setKeepScreenOn(true)
+            .setAppOrientation(0)
+            .setGDPRRequired(false)
+            .setMultiWindowEnabled(false)
+            .setRequestedAdOrientation(0)
+            .setTestModeEnabled(true)
+
+        // Configure AdColony in your launching Activity's onCreate() method so that cached ads can
+        // be available as soon as possible
+        AdColony.configure(this, appOptions, PlacementId.APP_ID, PlacementId.ZONE_ID)
+
+
+        // Ad specific options to be sent with request
+        adOptions = AdColonyAdOptions()
+            .enableConfirmationDialog(false)
+            .enableResultsDialog(false)
+
+
+        // Set up listener for interstitial ad callbacks. You only need to implement the callbacks
+        // that you care about. The only required callback is onRequestFilled, as this is the only
+        // way to get an ad object.
+
+        listener = object : AdColonyInterstitialListener() {
+            override fun onRequestFilled(ad: AdColonyInterstitial?) {
+                // Ad passed back in request filled callback, ad can now be shown
+                this@MainActivityForeignMode.ad = ad!!
+                Log.d(TAG, "onRequestFilled")
+                this@MainActivityForeignMode.ad.show()
+                updateState()
+            }
+
+            override fun onOpened(ad: AdColonyInterstitial?) {
+                // Request a new ad if ad is expiring
+                super.onOpened(ad)
+                Log.d(TAG, "onOpened")
+                updateState()
+                AppManager.isPlayingAd = true
+            }
+
+            override fun onRequestNotFilled(zone: AdColonyZone?) {
+                // Ad request was not filled
+                super.onRequestNotFilled(zone)
+                Log.d(TAG, "onRequestNotFilled ")
+                updateState()
+                playAds()
+            }
+
+            override fun onExpiring(ad: AdColonyInterstitial?) {
+                // Request a new ad if ad is expiring
+                super.onExpiring(ad)
+                AdColony.requestInterstitial(PlacementId.ZONE_ID, this, adOptions);
+                Log.d(TAG, "onExpiring")
+                updateState()
+            }
+
+            override fun onLeftApplication(ad: AdColonyInterstitial?) {
+                super.onLeftApplication(ad)
+                updateState()
+            }
+
+            override fun onClosed(ad: AdColonyInterstitial?) {
+                super.onClosed(ad)
+                Log.d(TAG, "onClosed")
+                updateState()
+                AppManager.isPlayingAd = false
+            }
+
+            override fun onClicked(ad: AdColonyInterstitial?) {
+                super.onClicked(ad)
+                Log.d(TAG, "onClicked")
+                updateState()
+            }
+        }
+
     }
 
 
@@ -155,17 +238,6 @@ class MainActivityForeignMode : AppCompatActivity() {
         viewModel.forcedRetry.set(0)
         prefetchInterstitial()
 
-        db.getUser()?.token?.let {
-            network.me(it, object : ResponseListener {
-                override fun onSuccess(message: String) {
-                    Log.d(AppManager.TAG, message)
-                }
-
-                override fun onFailure(message: String) {
-                    Log.d(AppManager.TAG, message)
-                }
-            })
-        }
     }
 
     override fun onStop() {
@@ -180,8 +252,7 @@ class MainActivityForeignMode : AppCompatActivity() {
 
 
     private fun showAds() {
-        updateState()
-        playAds()
+        AdColony.requestInterstitial(PlacementId.ZONE_ID, listener, adOptions)
     }
 
     private fun playAds() {
@@ -302,7 +373,6 @@ class MainActivityForeignMode : AppCompatActivity() {
                     Log.d(TAG, "onRewardsUnlocked " + map!!.size)
                     updateState()
                     AppManager.isPlayingAd = false
-                    (this@MainActivityForeignMode.application as AppManager).callAdsAPI()
                 }
             })
     }

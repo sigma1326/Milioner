@@ -1,7 +1,6 @@
 package com.ads.milioner.Model.network
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.annotation.Keep
 import com.ads.milioner.Model.AppManager
 import com.ads.milioner.Model.database.DataBaseRepositoryImpl
@@ -19,7 +18,6 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 if (it.body() is RefreshResponse) {
-                    Log.d(AppManager.TAG, it.body()!!.token)
                     val user = db.getUser()
                     user?.let { usr ->
                         usr.token = it.body()!!.token
@@ -49,9 +47,6 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 if (it.body() is AdsResponse) {
-                    Log.d(AppManager.TAG, "reward: " + it.body()!!.reward.toString())
-                    Log.d(AppManager.TAG, "money :" + it.body()!!.money.toString())
-
                     it.body()!!.money?.let { it1 -> db.updateBalance(it1) }
                     responseListener.onSuccess(it.body()!!.reward.toString())
                 } else {
@@ -71,8 +66,6 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 if (it.body() is CheckIPResponse) {
-                    Log.d(AppManager.TAG, it.body()!!.status.toString())
-
                     responseListener.onSuccess(it.body()!!.status.toString())
                 } else {
                     responseListener.onFailure("failed check ip")
@@ -91,9 +84,6 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 if (it.body() is ChargeResponse) {
-                    Log.d(AppManager.TAG, it.body()!!.success.toString())
-                    Log.d(AppManager.TAG, it.body()!!.money.toString())
-
                     if (it.body()!!.success == null) {
                         responseListener.onSuccess("null")
                     } else {
@@ -108,7 +98,6 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
             }, {
                 it.printStackTrace()
                 responseListener.onFailure("failed charge")
-
             })
     }
 
@@ -118,9 +107,6 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 if (it.body() is MeResponse) {
-                    Log.d(AppManager.TAG, it.body()!!.apiKey)
-                    Log.d(AppManager.TAG, it.body()!!.phone)
-                    Log.d(AppManager.TAG, it.body()!!.money.toString())
                     val user = db.getUser()
                     user?.let { usr ->
                         usr.apiKey = it.body()!!.apiKey
