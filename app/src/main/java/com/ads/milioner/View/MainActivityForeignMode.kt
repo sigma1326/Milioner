@@ -148,11 +148,19 @@ class MainActivityForeignMode : AppCompatActivity() {
         }
 
 
+        // Your user's consent String. In this case, the user has given consent to store
+        // and process personal information.
+        val consent = "1"
+
+        // The value passed via setGDPRRequired() will determine the GDPR requirement of
+        // the user. If it's set to true, the user is subject to the GDPR laws.
+
         // Construct optional app options object to be sent with configure
         val appOptions = AdColonyAppOptions()
             .setKeepScreenOn(true)
             .setAppOrientation(0)
-            .setGDPRRequired(false)
+            .setGDPRRequired(true)
+            .setGDPRConsentString(consent)
             .setMultiWindowEnabled(false)
             .setRequestedAdOrientation(0)
             .setTestModeEnabled(true)
