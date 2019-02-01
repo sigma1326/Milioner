@@ -199,12 +199,15 @@ class AppManager : MultiDexApplication() {
                 val hashString = "$timeStamp$gid$timeStamp${user.apiKey}"
                 val hash = Hashing.sha256().hashString(hashString, StandardCharsets.UTF_8).toString()
 
+//                Log.d(AppManager.TAG, "before: " + db.getUser()?.balance.toString())
+
                 network.ads(
                     user.token.toString()
                     , gid, hash, timeStamp
                     , object : ResponseListener {
                         override fun onSuccess(message: String) {
                             Log.d(AppManager.TAG, message)
+//                            Log.d(AppManager.TAG, "after: " + db.getUser()?.balance.toString())
                             deactivateReward()
                         }
 

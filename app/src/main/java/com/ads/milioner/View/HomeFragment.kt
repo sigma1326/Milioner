@@ -155,25 +155,6 @@ class HomeFragment : Fragment() {
                 updateState()
                 AppManager.isPlayingAd = false
                 (activity?.application as AppManager).callAdsAPI()
-                db.getUser()?.token?.let {
-                    network.me(it, object : ResponseListener {
-                        override fun onSuccess(message: String) {
-                            Log.d(AppManager.TAG, message)
-                            viewModel.user = db.getUserLiveData()
-                            viewModel.user.observe(activity!!, Observer {
-                                if (it != null && tv_balance != null) {
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        tv_balance?.text = it.balance.toString()
-                                    }, 1500)
-                                }
-                            })
-                        }
-
-                        override fun onFailure(message: String) {
-                            Log.d(AppManager.TAG, message)
-                        }
-                    })
-                }
             }
 
             override fun onClicked(ad: AdColonyInterstitial?) {
@@ -231,25 +212,6 @@ class HomeFragment : Fragment() {
                 AppManager.isPlayingAd = false
                 viewModel.needToReloadAd = true
                 (activity?.application as AppManager).callAdsAPI()
-                db.getUser()?.token?.let {
-                    network.me(it, object : ResponseListener {
-                        override fun onSuccess(message: String) {
-                            Log.d(AppManager.TAG, message)
-                            viewModel.user = db.getUserLiveData()
-                            viewModel.user.observe(activity!!, Observer {
-                                if (it != null && tv_balance != null) {
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        tv_balance?.text = it.balance.toString()
-                                    }, 1500)
-                                }
-                            })
-                        }
-
-                        override fun onFailure(message: String) {
-                            Log.d(AppManager.TAG, message)
-                        }
-                    })
-                }
             }
 
             override fun onRewardedVideoStarted() {
@@ -282,33 +244,18 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         mRewardedVideoAd.resume(activity)
-    }
 
-    override fun onPause() {
-        super.onPause()
-        mRewardedVideoAd.pause(activity)
-    }
-
-    override fun onDestroy() {
-        disposable.dispose()
-        super.onDestroy()
-        mRewardedVideoAd.destroy(activity)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Log.d(AppManager.TAG, "start")
         viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
-        viewModel.user = db.getUserLiveData()
-        viewModel.user.observe(activity!!, Observer {
+        viewModel.init(db)
+
+        viewModel.user.observe(this, Observer {
             if (it != null && tv_balance != null) {
-                Handler(Looper.getMainLooper()).postDelayed({ tv_balance?.text = it.balance.toString() }, 1500)
+//                Log.d(AppManager.TAG, it.balance.toString())
+                Handler(Looper.getMainLooper()).postDelayed({
+                    tv_balance?.text = it.balance.toString()
+                }, 1500)
             }
         })
-
-
-
-
 
         initAds()
 
@@ -326,6 +273,26 @@ class HomeFragment : Fragment() {
                 }
             })
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(AppManager.TAG, "pause")
+        mRewardedVideoAd.pause(activity)
+    }
+
+    override fun onDestroy() {
+        Log.d(AppManager.TAG, "destroy")
+        disposable.dispose()
+        super.onDestroy()
+        mRewardedVideoAd.destroy(activity)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(AppManager.TAG, "start")
+
+
     }
 
     override fun onCreateView(

@@ -22,6 +22,7 @@ class DialogMaker {
             view?.et_code?.setText(phone)
 
             val alertDialog = builder.create()
+            alertDialog.setCancelable(false)
             alertDialog.show()
 
             view.confirm_btn.setOnClickListener {
