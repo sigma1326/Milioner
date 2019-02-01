@@ -10,7 +10,6 @@ import com.ads.milioner.Model.network.NetworkRepositoryImpl
 import com.ads.milioner.Model.network.model.ResponseListener
 import com.ads.milioner.ads.InterstitialFetcher
 import com.ads.milioner.ads.PlacementId
-import com.facebook.stetho.Stetho
 import com.github.pwittchen.reactivenetwork.library.rx2.internet.observing.InternetObservingSettings
 import com.github.pwittchen.reactivenetwork.library.rx2.internet.observing.strategy.SocketInternetObservingStrategy
 import com.google.common.hash.Hashing
@@ -48,7 +47,7 @@ class AppManager : MultiDexApplication() {
 
         getUncaughtExceptions()
 
-        Stetho.initializeWithDefaults(this)
+//        Stetho.initializeWithDefaults(this)
 
         //start Koin DI
         startKoin(this, listOf(appModule))
@@ -60,7 +59,7 @@ class AppManager : MultiDexApplication() {
                 .build()
         )
 
-        initADS()
+//        initADS()
         db = DataBaseRepositoryImpl(
             Room.databaseBuilder(
                 this, DataBase::class.java,
@@ -86,14 +85,14 @@ class AppManager : MultiDexApplication() {
         mInMobiAdRequest = InMobiAdRequest.Builder(PlacementId.YOUR_PLACEMENT_ID)
             .setMonetizationContext(InMobiAdRequest.MonetizationContext.MONETIZATION_CONTEXT_ACTIVITY).build()
         interstitialAdRequestListener =
-                InMobiInterstitial.InterstitialAdRequestListener { inMobiAdRequestStatus, inMobiInterstitial ->
-                    if (inMobiAdRequestStatus.statusCode == InMobiAdRequestStatus.StatusCode.NO_ERROR && null != inMobiInterstitial) {
-                        mIntQueue.offer(inMobiInterstitial)
-                        signalIntResult(true)
-                    } else {
-                        signalIntResult(false)
-                    }
+            InMobiInterstitial.InterstitialAdRequestListener { inMobiAdRequestStatus, inMobiInterstitial ->
+                if (inMobiAdRequestStatus.statusCode == InMobiAdRequestStatus.StatusCode.NO_ERROR && null != inMobiInterstitial) {
+                    mIntQueue.offer(inMobiInterstitial)
+                    signalIntResult(true)
+                } else {
+                    signalIntResult(false)
                 }
+            }
 
         fetchInterstitial(null)
     }

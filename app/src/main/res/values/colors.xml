@@ -10,19 +10,19 @@
 
 
     <!--Game Colors-->
-    <color name="textColorDark">#f6f6f6</color>
+    <color name="textColorDark">#000000</color>
     <color name="textColorLight">#f6f6f6</color>
     <color name="textColor">#f3e5f5</color>
     <color name="textDark">#000</color>
 
     <color name="lightUpRectangle">#cf3721</color>
-    <color name="cellRectangle">#f1f3ce</color>
+    <color name="cellRectangle">#6E9BC0</color>
     <color name="backgroundRectangle">#1E74BC</color>
 
     <color name="toolbar">#de7a22</color>
     <color name="background">#104572</color>
 
-    <color name="cellColor2">#7f8c8d</color>
+    <color name="cellColor2">#ffffff</color>
     <color name="cellColor4">#D84315</color>
     <color name="cellColor8">#FFB300</color>
     <color name="cellColor16">#673AB7</color>

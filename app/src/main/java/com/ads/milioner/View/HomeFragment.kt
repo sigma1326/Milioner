@@ -27,6 +27,11 @@ import com.ads.milioner.ads.InterstitialFetcher
 import com.ads.milioner.ads.PlacementId
 import com.ads.milioner.util.DialogMaker
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.reward.RewardItem
+import com.google.android.gms.ads.reward.RewardedVideoAd
+import com.google.android.gms.ads.reward.RewardedVideoAdListener
 import com.inmobi.ads.InMobiAdRequestStatus
 import com.inmobi.ads.InMobiInterstitial
 import com.inmobi.ads.listeners.InterstitialAdEventListener
@@ -52,11 +57,11 @@ class HomeFragment : Fragment() {
     private val TAG = AppManager.TAG
     private val mHandler = Handler()
 
-
     private lateinit var ad: AdColonyInterstitial
     private lateinit var listener: AdColonyInterstitialListener
     private lateinit var adOptions: AdColonyAdOptions
 
+    private lateinit var mRewardedVideoAd: RewardedVideoAd
 
     private lateinit var viewModel: HomeViewModel
 
@@ -73,12 +78,19 @@ class HomeFragment : Fragment() {
                 isConnected = it
             }
 
+        // Your user's consent String. In this case, the user has given consent to store
+        // and process personal information.
+        val consent = "1"
+
+        // The value passed via setGDPRRequired() will determine the GDPR requirement of
+        // the user. If it's set to true, the user is subject to the GDPR laws.
 
         // Construct optional app options object to be sent with configure
         val appOptions = AdColonyAppOptions()
             .setKeepScreenOn(true)
             .setAppOrientation(0)
-            .setGDPRRequired(false)
+            .setGDPRRequired(true)
+            .setGDPRConsentString(consent)
             .setMultiWindowEnabled(false)
             .setRequestedAdOrientation(0)
             .setTestModeEnabled(true)
@@ -104,7 +116,7 @@ class HomeFragment : Fragment() {
                 this@HomeFragment.ad = ad!!
                 Log.d(TAG, "onRequestFilled")
                 this@HomeFragment.ad.show()
-                updateState()
+                pb_ads.visibility = View.VISIBLE
             }
 
             override fun onOpened(ad: AdColonyInterstitial?) {
@@ -113,6 +125,7 @@ class HomeFragment : Fragment() {
                 Log.d(TAG, "onOpened")
                 updateState()
                 AppManager.isPlayingAd = true
+                viewModel.needToReloadAd = true
             }
 
             override fun onRequestNotFilled(zone: AdColonyZone?) {
@@ -120,13 +133,13 @@ class HomeFragment : Fragment() {
                 super.onRequestNotFilled(zone)
                 Log.d(TAG, "onRequestNotFilled ")
                 updateState()
-                playAds()
+//                playAds()
             }
 
             override fun onExpiring(ad: AdColonyInterstitial?) {
                 // Request a new ad if ad is expiring
                 super.onExpiring(ad)
-                AdColony.requestInterstitial(PlacementId.ZONE_ID, this, adOptions);
+                AdColony.requestInterstitial(PlacementId.ZONE_ID, this, adOptions)
                 Log.d(TAG, "onExpiring")
                 updateState()
             }
@@ -142,6 +155,25 @@ class HomeFragment : Fragment() {
                 updateState()
                 AppManager.isPlayingAd = false
                 (activity?.application as AppManager).callAdsAPI()
+                db.getUser()?.token?.let {
+                    network.me(it, object : ResponseListener {
+                        override fun onSuccess(message: String) {
+                            Log.d(AppManager.TAG, message)
+                            viewModel.user = db.getUserLiveData()
+                            viewModel.user.observe(activity!!, Observer {
+                                if (it != null && tv_balance != null) {
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        tv_balance?.text = it.balance.toString()
+                                    }, 1500)
+                                }
+                            })
+                        }
+
+                        override fun onFailure(message: String) {
+                            Log.d(AppManager.TAG, message)
+                        }
+                    })
+                }
             }
 
             override fun onClicked(ad: AdColonyInterstitial?) {
@@ -150,12 +182,117 @@ class HomeFragment : Fragment() {
                 updateState()
             }
         }
+
+
+        MobileAds.initialize(activity, PlacementId.AD_MOB_APP_ID)
+
+
+        // Use an activity context to get the rewarded video instance.
+        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(activity)
+        mRewardedVideoAd.rewardedVideoAdListener = object : RewardedVideoAdListener {
+            override fun onRewardedVideoAdClosed() {
+                Log.d(TAG, "onRewardedVideoAdClosed")
+                updateState()
+                AppManager.isPlayingAd = false
+                viewModel.needToReloadAd = true
+            }
+
+            override fun onRewardedVideoAdLeftApplication() {
+                Log.d(TAG, "onRewardedVideoAdLeftApplication")
+                updateState()
+                AppManager.isPlayingAd = false
+                viewModel.needToReloadAd = true
+            }
+
+            override fun onRewardedVideoAdLoaded() {
+                Log.d(TAG, "onRewardedVideoAdLoaded")
+                updateState()
+                viewModel.needToReloadAd = true
+                if (mRewardedVideoAd.isLoaded) {
+                    mRewardedVideoAd.show()
+                }
+            }
+
+            override fun onRewardedVideoAdOpened() {
+                Log.d(TAG, "onRewardedVideoAdOpened")
+                updateState()
+                AppManager.isPlayingAd = true
+                viewModel.needToReloadAd = true
+            }
+
+            override fun onRewardedVideoCompleted() {
+                Log.d(TAG, "onRewardedVideoCompleted")
+                updateState()
+            }
+
+            override fun onRewarded(p0: RewardItem?) {
+                Log.d(TAG, "onRewarded")
+                updateState()
+                AppManager.isPlayingAd = false
+                viewModel.needToReloadAd = true
+                (activity?.application as AppManager).callAdsAPI()
+                db.getUser()?.token?.let {
+                    network.me(it, object : ResponseListener {
+                        override fun onSuccess(message: String) {
+                            Log.d(AppManager.TAG, message)
+                            viewModel.user = db.getUserLiveData()
+                            viewModel.user.observe(activity!!, Observer {
+                                if (it != null && tv_balance != null) {
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        tv_balance?.text = it.balance.toString()
+                                    }, 1500)
+                                }
+                            })
+                        }
+
+                        override fun onFailure(message: String) {
+                            Log.d(AppManager.TAG, message)
+                        }
+                    })
+                }
+            }
+
+            override fun onRewardedVideoStarted() {
+                Log.d(TAG, "onRewardedVideoStarted")
+                updateState()
+                viewModel.needToReloadAd = true
+            }
+
+            override fun onRewardedVideoAdFailedToLoad(p0: Int) {
+                AdColony.requestInterstitial(PlacementId.ZONE_ID, listener, adOptions)
+                Log.d(TAG, "onRewardedVideoAdFailedToLoad")
+                updateState()
+                viewModel.needToReloadAd = true
+            }
+
+        }
     }
 
+
+    private fun loadRewardedVideoAd() {
+        if (!viewModel.needToReloadAd) {
+            if (!mRewardedVideoAd.isLoaded) {
+                mRewardedVideoAd.loadAd(PlacementId.AD_MOB_AD_UNIT_ID, AdRequest.Builder().build())
+            }
+        } else {
+            mRewardedVideoAd.loadAd(PlacementId.AD_MOB_AD_UNIT_ID, AdRequest.Builder().build())
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mRewardedVideoAd.resume(activity)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mRewardedVideoAd.pause(activity)
+    }
 
     override fun onDestroy() {
         disposable.dispose()
         super.onDestroy()
+        mRewardedVideoAd.destroy(activity)
     }
 
     override fun onStart() {
@@ -166,7 +303,6 @@ class HomeFragment : Fragment() {
         viewModel.user.observe(activity!!, Observer {
             if (it != null && tv_balance != null) {
                 Handler(Looper.getMainLooper()).postDelayed({ tv_balance?.text = it.balance.toString() }, 1500)
-                Log.d(AppManager.TAG, "money :: " + it.balance.toString())
             }
         })
 
@@ -177,7 +313,7 @@ class HomeFragment : Fragment() {
         initAds()
 
         viewModel.forcedRetry.set(0)
-        prefetchInterstitial()
+//        prefetchInterstitial()
 
         db.getUser()?.token?.let {
             network.me(it, object : ResponseListener {
@@ -268,7 +404,7 @@ class HomeFragment : Fragment() {
                     when (message) {
                         "true" -> {
                             pb_ads.visibility = View.VISIBLE
-                            AdColony.requestInterstitial(PlacementId.ZONE_ID, listener, adOptions)
+                            loadRewardedVideoAd()
                         }
                         "false" -> {
                             SweetAlertDialog(activity, SweetAlertDialog.WARNING_TYPE)
@@ -405,7 +541,7 @@ class HomeFragment : Fragment() {
                 override fun onAdLoadSucceeded(inMobiInterstitial: InMobiInterstitial?) {
                     super.onAdLoadSucceeded(inMobiInterstitial)
                     Log.d(TAG, "onAdLoadSuccessful")
-                    updateState()
+                    pb_ads.visibility = View.VISIBLE
                     if (inMobiInterstitial?.isReady!!) {
                         Log.d(TAG, "Ad is Ready")
                         try {

@@ -12,4 +12,7 @@ class GameViewModel : ViewModel() {
     var forcedRetry = AtomicInteger(0)
     var mInterstitialAd: InMobiInterstitial? = null
     lateinit var interstitialFetcher: InterstitialFetcher
+
+    var needToReloadAd = false
+
 }

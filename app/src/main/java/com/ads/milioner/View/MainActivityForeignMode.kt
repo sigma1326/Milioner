@@ -19,6 +19,11 @@ import com.ads.milioner.ViewModel.GameViewModel
 import com.ads.milioner.ads.InterstitialFetcher
 import com.ads.milioner.ads.PlacementId
 import com.ads.milioner.game.Tile
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.reward.RewardItem
+import com.google.android.gms.ads.reward.RewardedVideoAd
+import com.google.android.gms.ads.reward.RewardedVideoAdListener
 import com.inmobi.ads.InMobiAdRequestStatus
 import com.inmobi.ads.InMobiInterstitial
 import com.inmobi.ads.listeners.InterstitialAdEventListener
@@ -58,6 +63,18 @@ class MainActivityForeignMode : AppCompatActivity() {
     private lateinit var adOptions: AdColonyAdOptions
 
     private lateinit var viewModel: GameViewModel
+
+    private lateinit var mRewardedVideoAd: RewardedVideoAd
+
+    private fun loadRewardedVideoAd() {
+        if (!viewModel.needToReloadAd) {
+            if (!mRewardedVideoAd.isLoaded) {
+                mRewardedVideoAd.loadAd(PlacementId.AD_MOB_AD_UNIT_ID, AdRequest.Builder().build())
+            }
+        } else {
+            mRewardedVideoAd.loadAd(PlacementId.AD_MOB_AD_UNIT_ID, AdRequest.Builder().build())
+        }
+    }
 
     @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -162,6 +179,7 @@ class MainActivityForeignMode : AppCompatActivity() {
                 Log.d(TAG, "onRequestFilled")
                 this@MainActivityForeignMode.ad.show()
                 updateState()
+                viewModel.needToReloadAd = true
             }
 
             override fun onOpened(ad: AdColonyInterstitial?) {
@@ -170,6 +188,7 @@ class MainActivityForeignMode : AppCompatActivity() {
                 Log.d(TAG, "onOpened")
                 updateState()
                 AppManager.isPlayingAd = true
+                viewModel.needToReloadAd = true
             }
 
             override fun onRequestNotFilled(zone: AdColonyZone?) {
@@ -177,20 +196,23 @@ class MainActivityForeignMode : AppCompatActivity() {
                 super.onRequestNotFilled(zone)
                 Log.d(TAG, "onRequestNotFilled ")
                 updateState()
-                playAds()
+//                playAds()
+                viewModel.needToReloadAd = true
             }
 
             override fun onExpiring(ad: AdColonyInterstitial?) {
                 // Request a new ad if ad is expiring
                 super.onExpiring(ad)
-                AdColony.requestInterstitial(PlacementId.ZONE_ID, this, adOptions);
+                AdColony.requestInterstitial(PlacementId.ZONE_ID, this, adOptions)
                 Log.d(TAG, "onExpiring")
                 updateState()
+                viewModel.needToReloadAd = true
             }
 
             override fun onLeftApplication(ad: AdColonyInterstitial?) {
                 super.onLeftApplication(ad)
                 updateState()
+                viewModel.needToReloadAd = true
             }
 
             override fun onClosed(ad: AdColonyInterstitial?) {
@@ -198,15 +220,78 @@ class MainActivityForeignMode : AppCompatActivity() {
                 Log.d(TAG, "onClosed")
                 updateState()
                 AppManager.isPlayingAd = false
+                viewModel.needToReloadAd = true
             }
 
             override fun onClicked(ad: AdColonyInterstitial?) {
                 super.onClicked(ad)
                 Log.d(TAG, "onClicked")
                 updateState()
+                viewModel.needToReloadAd = true
             }
         }
 
+
+
+        MobileAds.initialize(this, PlacementId.AD_MOB_APP_ID)
+
+
+        // Use an activity context to get the rewarded video instance.
+        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this)
+        mRewardedVideoAd.rewardedVideoAdListener = object : RewardedVideoAdListener {
+            override fun onRewardedVideoAdClosed() {
+                Log.d(TAG, "onRewardedVideoAdClosed")
+                updateState()
+                viewModel.needToReloadAd = true
+            }
+
+            override fun onRewardedVideoAdLeftApplication() {
+                Log.d(TAG, "onRewardedVideoAdLeftApplication")
+                updateState()
+                viewModel.needToReloadAd = true
+            }
+
+            override fun onRewardedVideoAdLoaded() {
+                Log.d(TAG, "onRewardedVideoAdLoaded")
+                updateState()
+                viewModel.needToReloadAd = true
+                if (mRewardedVideoAd.isLoaded) {
+                    mRewardedVideoAd.show()
+                }
+            }
+
+            override fun onRewardedVideoAdOpened() {
+                Log.d(TAG, "onRewardedVideoAdOpened")
+                updateState()
+                viewModel.needToReloadAd = true
+            }
+
+            override fun onRewardedVideoCompleted() {
+                Log.d(TAG, "onRewardedVideoCompleted")
+                updateState()
+                viewModel.needToReloadAd = true
+            }
+
+            override fun onRewarded(p0: RewardItem?) {
+                Log.d(TAG, "onRewarded")
+                updateState()
+                viewModel.needToReloadAd = true
+            }
+
+            override fun onRewardedVideoStarted() {
+                Log.d(TAG, "onRewardedVideoStarted")
+                updateState()
+                viewModel.needToReloadAd = true
+            }
+
+            override fun onRewardedVideoAdFailedToLoad(p0: Int) {
+                AdColony.requestInterstitial(PlacementId.ZONE_ID, listener, adOptions)
+                Log.d(TAG, "onRewardedVideoAdFailedToLoad")
+                updateState()
+                viewModel.needToReloadAd = true
+            }
+
+        }
     }
 
 
@@ -214,12 +299,14 @@ class MainActivityForeignMode : AppCompatActivity() {
         super.onPause()
 //        save()
         running = false
+        mRewardedVideoAd.pause(this)
     }
 
     override fun onResume() {
         super.onResume()
 //        load()
         running = true
+        mRewardedVideoAd.resume(this)
     }
 
     override fun onStart() {
@@ -228,7 +315,6 @@ class MainActivityForeignMode : AppCompatActivity() {
         viewModel.user = db.getUserLiveData()
         viewModel.user.observe(this, Observer {
             if (it != null) {
-                Log.d(AppManager.TAG, "money :: " + it.balance.toString())
             }
         })
 
@@ -236,7 +322,7 @@ class MainActivityForeignMode : AppCompatActivity() {
         initAds()
 
         viewModel.forcedRetry.set(0)
-        prefetchInterstitial()
+//        prefetchInterstitial()
 
     }
 
@@ -248,11 +334,12 @@ class MainActivityForeignMode : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        mRewardedVideoAd.destroy(this)
     }
 
 
     private fun showAds() {
-        AdColony.requestInterstitial(PlacementId.ZONE_ID, listener, adOptions)
+        loadRewardedVideoAd()
     }
 
     private fun playAds() {

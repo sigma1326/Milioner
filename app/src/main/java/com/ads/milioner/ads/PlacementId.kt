@@ -9,5 +9,11 @@ interface PlacementId {
 
         val APP_ID = "app10d3c36facf143ee96"
         val ZONE_ID = "vz90599ac6d05c4291a7"
+
+
+
+
+        const val AD_MOB_APP_ID = "ca-app-pub-1131365278323885~5774540828"
+        const val AD_MOB_AD_UNIT_ID = "ca-app-pub-1131365278323885/6070301717"
     }
 }

@@ -2,10 +2,7 @@ package com.ads.milioner.game;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Typeface;
+import android.graphics.*;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
@@ -65,6 +62,20 @@ public class MainView extends View {
     //Assets
     private Drawable backgroundRectangle;
     private Drawable lightUpRectangle;
+    private Bitmap cell2;
+    private Bitmap cell4;
+    private Bitmap cell8;
+    private Bitmap cell16;
+    private Bitmap cell32;
+    private Bitmap cell64;
+    private Bitmap cell128;
+    private Bitmap cell256;
+    private Bitmap cell512;
+    private Bitmap cell1024;
+    private Bitmap cell2048;
+    private Bitmap cell4096;
+    private Bitmap cell8192;
+    private Bitmap cell16384;
     private Drawable fadeRectangle;
     private Bitmap background = null;
     private BitmapDrawable loseGameOverlay;
@@ -94,6 +105,20 @@ public class MainView extends View {
             backgroundRectangle = resources.getDrawable(R.drawable.background_rectangle);
             lightUpRectangle = resources.getDrawable(R.drawable.light_up_rectangle);
             fadeRectangle = resources.getDrawable(R.drawable.fade_rectangle);
+            cell2 = BitmapFactory.decodeResource(resources, R.drawable.cell_2);
+            cell4 = BitmapFactory.decodeResource(resources, R.drawable.cell_4);
+            cell8 = BitmapFactory.decodeResource(resources, R.drawable.cell_8);
+            cell16 = BitmapFactory.decodeResource(resources, R.drawable.cell_16);
+            cell32 = BitmapFactory.decodeResource(resources, R.drawable.cell_32);
+            cell64 = BitmapFactory.decodeResource(resources, R.drawable.cell_64);
+            cell128 = BitmapFactory.decodeResource(resources, R.drawable.cell_128);
+            cell256 = BitmapFactory.decodeResource(resources, R.drawable.cell_256);
+            cell512 = BitmapFactory.decodeResource(resources, R.drawable.cell_512);
+            cell1024 = BitmapFactory.decodeResource(resources, R.drawable.cell_1024);
+            cell2048 = BitmapFactory.decodeResource(resources, R.drawable.cell_2048);
+            cell4096 = BitmapFactory.decodeResource(resources, R.drawable.cell_4096);
+            cell8192 = BitmapFactory.decodeResource(resources, R.drawable.cell_8192);
+            cell16384 = BitmapFactory.decodeResource(resources, R.drawable.cell_16384);
             this.setBackgroundColor(resources.getColor(R.color.background));
             Typeface font = Typeface.createFromAsset(resources.getAssets(), "ClearSans-Bold.ttf");
             paint.setTypeface(font);
@@ -115,6 +140,20 @@ public class MainView extends View {
             backgroundRectangle = resources.getDrawable(R.drawable.background_rectangle);
             lightUpRectangle = resources.getDrawable(R.drawable.light_up_rectangle);
             fadeRectangle = resources.getDrawable(R.drawable.fade_rectangle);
+            cell2 = BitmapFactory.decodeResource(resources, R.drawable.cell_2);
+            cell4 = BitmapFactory.decodeResource(resources, R.drawable.cell_4);
+            cell8 = BitmapFactory.decodeResource(resources, R.drawable.cell_8);
+            cell16 = BitmapFactory.decodeResource(resources, R.drawable.cell_16);
+            cell32 = BitmapFactory.decodeResource(resources, R.drawable.cell_32);
+            cell64 = BitmapFactory.decodeResource(resources, R.drawable.cell_64);
+            cell128 = BitmapFactory.decodeResource(resources, R.drawable.cell_128);
+            cell256 = BitmapFactory.decodeResource(resources, R.drawable.cell_256);
+            cell512 = BitmapFactory.decodeResource(resources, R.drawable.cell_512);
+            cell1024 = BitmapFactory.decodeResource(resources, R.drawable.cell_1024);
+            cell2048 = BitmapFactory.decodeResource(resources, R.drawable.cell_2048);
+            cell4096 = BitmapFactory.decodeResource(resources, R.drawable.cell_4096);
+            cell8192 = BitmapFactory.decodeResource(resources, R.drawable.cell_8192);
+            cell16384 = BitmapFactory.decodeResource(resources, R.drawable.cell_16384);
             this.setBackgroundColor(resources.getColor(R.color.background));
             Typeface font = Typeface.createFromAsset(resources.getAssets(), "fonts/ClearSans-Bold.ttf");
             paint.setTypeface(font);
@@ -189,12 +228,9 @@ public class MainView extends View {
 
     private void drawCellText(Canvas canvas, int value) {
         int textShiftY = centerText();
-        if (value >= 8) {
-            paint.setColor(getResources().getColor(R.color.textColorLight));
-        } else {
-            paint.setColor(getResources().getColor(R.color.textColorDark));
-        }
-        canvas.drawText("" + value, cellSize / 2f, cellSize / 2f - textShiftY, paint);
+        paint.setColor(getResources().getColor(R.color.textColorDark));
+        paint.setTextSize(50);
+        canvas.drawText("" + value, cellSize / 2f, cellSize / 2f - 2.9f * textShiftY, paint);
     }
 
     private void drawScoreText(Canvas canvas) {
@@ -594,6 +630,54 @@ public class MainView extends View {
             Bitmap bitmap = Bitmap.createBitmap(cellSize, cellSize, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
             drawDrawable(canvas, resources.getDrawable(cellRectangleIds[xx]), 0, 0, cellSize, cellSize);
+            Bitmap bitmap1;
+            switch (value) {
+                case 2:
+                    bitmap1 = cell2;
+                    break;
+                case 4:
+                    bitmap1 = cell4;
+                    break;
+                case 8:
+                    bitmap1 = cell8;
+                    break;
+                case 16:
+                    bitmap1 = cell16;
+                    break;
+                case 32:
+                    bitmap1 = cell32;
+                    break;
+                case 64:
+                    bitmap1 = cell64;
+                    break;
+                case 128:
+                    bitmap1 = cell128;
+                    break;
+                case 256:
+                    bitmap1 = cell256;
+                    break;
+                case 512:
+                    bitmap1 = cell512;
+                    break;
+                case 1024:
+                    bitmap1 = cell1024;
+                    break;
+                case 2048:
+                    bitmap1 = cell2048;
+                    break;
+                case 4096:
+                    bitmap1 = cell4096;
+                    break;
+                case 8192:
+                    bitmap1 = cell8192;
+                    break;
+                case 16384:
+                    bitmap1 = cell16384;
+                    break;
+                default:
+                    bitmap1 = cell16384;
+            }
+            canvas.drawBitmap(bitmap1, null, new Rect(0, 0, cellSize, cellSize), paint);
             drawCellText(canvas, value);
             bitmapCell[xx] = new BitmapDrawable(resources, bitmap);
         }
@@ -603,18 +687,18 @@ public class MainView extends View {
         int[] cellRectangleIds = new int[numCellTypes];
         cellRectangleIds[0] = R.drawable.cell_rectangle;
         cellRectangleIds[1] = R.drawable.cell_rectangle_2;
-        cellRectangleIds[2] = R.drawable.cell_rectangle_4;
-        cellRectangleIds[3] = R.drawable.cell_rectangle_8;
-        cellRectangleIds[4] = R.drawable.cell_rectangle_16;
-        cellRectangleIds[5] = R.drawable.cell_rectangle_32;
-        cellRectangleIds[6] = R.drawable.cell_rectangle_64;
-        cellRectangleIds[7] = R.drawable.cell_rectangle_128;
-        cellRectangleIds[8] = R.drawable.cell_rectangle_256;
-        cellRectangleIds[9] = R.drawable.cell_rectangle_512;
-        cellRectangleIds[10] = R.drawable.cell_rectangle_1024;
-        cellRectangleIds[11] = R.drawable.cell_rectangle_2048;
+        cellRectangleIds[2] = R.drawable.cell_rectangle_2;
+        cellRectangleIds[3] = R.drawable.cell_rectangle_2;
+        cellRectangleIds[4] = R.drawable.cell_rectangle_2;
+        cellRectangleIds[5] = R.drawable.cell_rectangle_2;
+        cellRectangleIds[6] = R.drawable.cell_rectangle_2;
+        cellRectangleIds[7] = R.drawable.cell_rectangle_2;
+        cellRectangleIds[8] = R.drawable.cell_rectangle_2;
+        cellRectangleIds[9] = R.drawable.cell_rectangle_2;
+        cellRectangleIds[10] = R.drawable.cell_rectangle_2;
+        cellRectangleIds[11] = R.drawable.cell_rectangle_2;
         for (int xx = 12; xx < cellRectangleIds.length; xx++) {
-            cellRectangleIds[xx] = R.drawable.cell_rectangle_4096;
+            cellRectangleIds[xx] = R.drawable.cell_rectangle_2;
         }
         return cellRectangleIds;
     }

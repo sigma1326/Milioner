@@ -191,7 +191,7 @@ public class MainGame {
 
     public void move(int direction) {
         aGrid.cancelAnimations();
-        // 0: up, 1: right, 2: down, 3: left
+        // 0: up, 1: right, cell_2: down, 3: left
         if (!isActive()) {
             return;
         }
@@ -236,7 +236,7 @@ public class MainGame {
                             maxTile = merged.getValue();
                         }
 
-                        // The mighty 2048 tile
+                        // The mighty cell_2048 tile
                         if (merged.getValue() >= winValue() && !gameWon()) {
                             gameState = gameState + GAME_WIN; // Set win state
                             endGame();
