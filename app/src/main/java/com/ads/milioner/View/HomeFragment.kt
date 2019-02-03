@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import com.adcolony.sdk.*
 import com.ads.milioner.Model.AppManager
 import com.ads.milioner.Model.database.DataBaseRepositoryImpl
@@ -360,6 +361,16 @@ class HomeFragment : Fragment() {
             }
         }
 
+        RxView.clicks(layout_game)
+            .filter {
+                pb_charge.visibility != View.VISIBLE && pb_ads.visibility != View.VISIBLE
+            }
+            .subscribe {
+                try {
+                    findNavController().navigate(R.id.action_homeFragment_to_gameFragment)
+                } catch (e: Exception) {
+                }
+            }
 
     }
 
