@@ -94,7 +94,7 @@ class HomeFragment : Fragment() {
             .setGDPRConsentString(consent)
             .setMultiWindowEnabled(false)
             .setRequestedAdOrientation(0)
-            .setTestModeEnabled(true)
+            .setTestModeEnabled(false)
 
         // Configure AdColony in your launching Activity's onCreate() method so that cached ads can
         // be available as soon as possible

@@ -172,7 +172,7 @@
         android:id="@+id/tv_charge_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="24dp"
         android:fontFamily="@font/vazir_medium"
         android:text="@string/charge_sim_balance"
         android:textColor="#ffffff"
@@ -180,7 +180,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/layout_charge"
         app:layout_constraintEnd_toEndOf="@+id/layout_charge"
         app:layout_constraintStart_toStartOf="@+id/layout_charge"
-        app:layout_constraintTop_toTopOf="@+id/layout_charge" />
+        app:layout_constraintTop_toTopOf="@+id/layout_charge"
+        app:layout_constraintVertical_bias="0.32999998" />
 
     <TextView
         android:id="@+id/tv_charge_hint"

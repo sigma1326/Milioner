@@ -82,6 +82,7 @@ class GameFragment : Fragment() {
         }
         t.start()
 
+        load()
         game_view?.game?.newGame()
 
         game_view?.setOnGameEndedListener {
@@ -97,7 +98,6 @@ class GameFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-//        load()
         AppManager.running = true
     }
 
@@ -117,7 +117,6 @@ class GameFragment : Fragment() {
         outState.putBoolean("hasState", true)
         save()
     }
-
 
 
     private fun save() {
@@ -152,7 +151,6 @@ class GameFragment : Fragment() {
         editor.putInt(TIMER, game_view?.elTime!!)
         editor.apply()
     }
-
 
 
     private fun load() {

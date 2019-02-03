@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
@@ -94,12 +96,12 @@ class LoginFragment : Fragment() {
                     btn_login.isEnabled = false
                     btn_login.setTextColor(Color.parseColor("#A6A6A6"))
                     btn_login.background =
-                            activity?.resources?.getDrawable(com.ads.milioner.R.drawable.btn_disabled_bkg, null)
+                        activity?.resources?.getDrawable(com.ads.milioner.R.drawable.btn_disabled_bkg, null)
                 } else {
                     btn_login.isEnabled = true
                     btn_login.setTextColor(Color.parseColor("#ffffff"))
                     btn_login.background =
-                            activity?.resources?.getDrawable(com.ads.milioner.R.drawable.button_bkg, null)
+                        activity?.resources?.getDrawable(com.ads.milioner.R.drawable.button_bkg, null)
                 }
             }
 
@@ -136,7 +138,13 @@ class LoginFragment : Fragment() {
                     Log.d(AppManager.TAG, message)
                     updateState(message, false)
 
-                    findNavController().navigate(com.ads.milioner.R.id.action_loginFragment_to_checkCodeFragment)
+                    try {
+                        val settings = PreferenceManager.getDefaultSharedPreferences(activity)
+                        settings.edit { clear() }
+                        findNavController().navigate(com.ads.milioner.R.id.action_loginFragment_to_checkCodeFragment)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
 
                 override fun onFailure(message: String) {
@@ -157,6 +165,12 @@ class LoginFragment : Fragment() {
                     token = ""
                 )
                 db.insertUser(user)
+                try {
+                    val settings = PreferenceManager.getDefaultSharedPreferences(activity)
+                    settings.edit { clear() }
+                } catch (e: Exception) {
+                }
+
             }
             activity?.finish()
             activity?.startActivity(Intent(activity, MainActivityForeignMode::class.java))

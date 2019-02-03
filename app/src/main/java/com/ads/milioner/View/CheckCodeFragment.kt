@@ -129,7 +129,7 @@ class CheckCodeFragment : Fragment() {
                 if (isConnected) {
                     login()
                 } else {
-                    updateState("دستگاه به اینترنت متصل نیست", true)
+                    updateState("No Internet Connection!", true)
                 }
             }
         }
@@ -144,7 +144,7 @@ class CheckCodeFragment : Fragment() {
                 if (isConnected) {
                     resend()
                 } else {
-                    updateState("دستگاه به اینترنت متصل نیست", true)
+                    updateState("No Internet Connection!", true)
                 }
             }
         }
@@ -157,7 +157,7 @@ class CheckCodeFragment : Fragment() {
             override fun onSuccess(message: String) {
                 Log.d(AppManager.TAG, message)
                 updateState(message, false)
-                Toast.makeText(activity, "کد با موفقیت ارسال شد", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, "Code Sent Successfully", Toast.LENGTH_SHORT).show()
             }
 
             override fun onFailure(message: String) {
@@ -195,8 +195,6 @@ class CheckCodeFragment : Fragment() {
             }
 
         })
-        activity?.finish()
-        activity?.startActivity(Intent(this.activity, MainActivity::class.java))
     }
 
     private fun updateState(message: String, isError: Boolean) {
