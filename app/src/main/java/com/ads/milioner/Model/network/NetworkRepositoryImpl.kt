@@ -12,6 +12,26 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 @Keep
 class NetworkRepositoryImpl(private val apiService: ApiService, private val db: DataBaseRepositoryImpl) :
     NetworkRepository {
+    override fun checkAds(responseListener: ResponseListener) {
+        apiService.checkIpForAds()
+            .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                if (it.body() is CheckAdsResponse) {
+                    if (it.body()?.status!!) {
+                        responseListener.onSuccess(it?.body()?.adProvider.toString())
+                    } else {
+                        responseListener.onFailure("failed check ads")
+                    }
+                } else {
+                    responseListener.onFailure("failed check ads")
+                }
+            }, {
+                it.printStackTrace()
+                responseListener.onFailure("failed check ads")
+            })
+    }
+
     override fun refresh(token: String, responseListener: ResponseListener) {
         apiService.refresh(token)
             .subscribeOn(io.reactivex.schedulers.Schedulers.io())

@@ -15,6 +15,7 @@ import com.ads.milioner.Model.AppManager
 import com.ads.milioner.Model.AppManager.Companion.running
 import com.ads.milioner.Model.database.DataBaseRepositoryImpl
 import com.ads.milioner.Model.network.NetworkRepositoryImpl
+import com.ads.milioner.Model.network.model.ResponseListener
 import com.ads.milioner.R
 import com.ads.milioner.ViewModel.GameViewModel
 import com.ads.milioner.ads.InterstitialFetcher
@@ -80,6 +81,8 @@ class MainActivityForeignMode : AppCompatActivity() {
     @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppManager.running = false
+
         try {
             setContentView(R.layout.activity_main_foreign_mode)
         } catch (e: Exception) {
@@ -294,7 +297,6 @@ class MainActivityForeignMode : AppCompatActivity() {
             }
 
             override fun onRewardedVideoAdFailedToLoad(p0: Int) {
-                AdColony.requestInterstitial(PlacementId.ZONE_ID, listener, adOptions)
                 Log.d(TAG, "onRewardedVideoAdFailedToLoad")
                 updateState()
                 viewModel.needToReloadAd = true
@@ -348,7 +350,26 @@ class MainActivityForeignMode : AppCompatActivity() {
 
 
     private fun showAds() {
-        loadRewardedVideoAd()
+        network.checkAds(object : ResponseListener {
+            override fun onSuccess(message: String) {
+                when (message) {
+                    "admob" -> {
+                        loadRewardedVideoAd()
+                    }
+                    "adcolony" -> {
+                        AdColony.requestInterstitial(PlacementId.ZONE_ID, listener, adOptions)
+                    }
+                    else -> {
+                        Log.d(TAG,"not defined ad")
+                    }
+                }
+            }
+
+            override fun onFailure(message: String) {
+                Log.d(TAG, message)
+            }
+
+        })
     }
 
     private fun playAds() {

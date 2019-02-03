@@ -94,7 +94,7 @@ class HomeFragment : Fragment() {
             .setGDPRConsentString(consent)
             .setMultiWindowEnabled(false)
             .setRequestedAdOrientation(0)
-            .setTestModeEnabled(false)
+            .setTestModeEnabled(true)
 
         // Configure AdColony in your launching Activity's onCreate() method so that cached ads can
         // be available as soon as possible
@@ -222,7 +222,6 @@ class HomeFragment : Fragment() {
             }
 
             override fun onRewardedVideoAdFailedToLoad(p0: Int) {
-                AdColony.requestInterstitial(PlacementId.ZONE_ID, listener, adOptions)
                 Log.d(TAG, "onRewardedVideoAdFailedToLoad")
                 updateState()
                 viewModel.needToReloadAd = true
@@ -382,7 +381,27 @@ class HomeFragment : Fragment() {
                     when (message) {
                         "true" -> {
                             pb_ads.visibility = View.VISIBLE
-                            loadRewardedVideoAd()
+                            network.checkAds(object : ResponseListener {
+                                override fun onSuccess(message: String) {
+                                    Log.d(TAG,message)
+                                    when (message) {
+                                        "admob" -> {
+                                            loadRewardedVideoAd()
+                                        }
+                                        "adcolony" -> {
+                                            AdColony.requestInterstitial(PlacementId.ZONE_ID, listener, adOptions)
+                                        }
+                                        else -> {
+                                            Log.d(TAG,"not defined ad")
+                                        }
+                                    }
+                                }
+
+                                override fun onFailure(message: String) {
+                                    Log.d(TAG, message)
+                                }
+
+                            })
                         }
                         "false" -> {
                             SweetAlertDialog(activity, SweetAlertDialog.WARNING_TYPE)

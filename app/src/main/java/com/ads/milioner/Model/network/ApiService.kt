@@ -29,6 +29,12 @@ interface ApiService {
     @FormUrlEncoded
     fun charge(@Header("Authorization") authorization: String, @Field("phone") phone: String): Observable<Response<ChargeResponse>>
 
+
+    @GET("/api/check-ip-ad/")
+    fun checkIpForAds(): Observable<Response<CheckAdsResponse>>
+
+
+
     @GET("/api/check-ip/")
     fun checkIP(): Observable<Response<CheckIPResponse>>
 
