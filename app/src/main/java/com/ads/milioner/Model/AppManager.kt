@@ -174,6 +174,9 @@ class AppManager : MultiDexApplication() {
             single { DataBaseRepositoryImpl(get()) }
         }
 
+        @JvmField
+        @Volatile
+        var running: Boolean = false
 
     }
 

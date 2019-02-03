@@ -9,8 +9,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import androidx.annotation.Keep;
+import com.ads.milioner.Model.AppManager;
 import com.ads.milioner.R;
-import com.ads.milioner.View.MainActivityForeignMode;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -299,6 +299,12 @@ public class MainView extends View {
         backgroundRectangle.setBounds(sXTime, sYAll, eXTime, eYAll);
         backgroundRectangle.draw(canvas);
         paint.setTextSize(titleTextSize);
+        try {
+            Typeface font = Typeface.createFromAsset(getResources().getAssets(), "fonts/ClearSans-Bold.ttf");
+            paint.setTypeface(font);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         paint.setColor(getResources().getColor(R.color.textColor));
         canvas.drawText(getResources().getString(R.string.timeText), sXTime + textMiddleTime, titleStartYAll, paint);
         paint.setTextSize(bodyTextSize);
@@ -534,7 +540,7 @@ public class MainView extends View {
             displayOverlay.setAlpha((int) (255 * alphaChange));
             displayOverlay.draw(canvas);
         }
-        MainActivityForeignMode.running = false;
+        AppManager.running = false;
     }
 
     private void drawPauseState(Canvas canvas) {
@@ -550,7 +556,7 @@ public class MainView extends View {
             displayOverlay.setAlpha((int) (255 * alphaChange));
             displayOverlay.draw(canvas);
         }
-        MainActivityForeignMode.running = false;
+        AppManager.running = false;
     }
 
     private void drawEndlessText(Canvas canvas) {
@@ -678,7 +684,7 @@ public class MainView extends View {
                     bitmap1 = cell16384;
             }
             canvas.drawBitmap(bitmap1, null, new Rect(0, 0, cellSize, cellSize), paint);
-            drawCellText(canvas, value);
+//            drawCellText(canvas, value);
             bitmapCell[xx] = new BitmapDrawable(resources, bitmap);
         }
     }

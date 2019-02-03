@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.adcolony.sdk.*
 import com.ads.milioner.Model.AppManager
+import com.ads.milioner.Model.AppManager.Companion.running
 import com.ads.milioner.Model.database.DataBaseRepositoryImpl
 import com.ads.milioner.Model.network.NetworkRepositoryImpl
 import com.ads.milioner.R
@@ -629,9 +630,4 @@ class MainActivityForeignMode : AppCompatActivity() {
     }
 
 
-    companion object {
-        @JvmField
-        @Volatile
-        var running: Boolean = false
-    }
 }

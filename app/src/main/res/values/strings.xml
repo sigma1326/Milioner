@@ -39,4 +39,6 @@
     <string name="for_now">For now…</string>
     <string name="endless">"Endless" Mode</string>
     <string name="target_phone_number">شماره تلفن مقصد</string>
+    <string name="play_game_hint">اگه حوصلت سر رفته بازی کن</string>
+    <string name="play_game">بازی کن</string>
 </resources>

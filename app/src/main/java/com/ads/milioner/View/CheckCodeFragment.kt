@@ -103,7 +103,7 @@ class CheckCodeFragment : Fragment() {
 
 
 
-        tv_hint.text = "Please Enter Activation Code Sent to  ${AppManager.phone}"
+        tv_hint?.text = "Please Enter Activation Code Sent to  ${AppManager.phone}"
 
 
         RxTextView.afterTextChangeEvents(et_code!!)

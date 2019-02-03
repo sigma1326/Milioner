@@ -115,14 +115,14 @@ class LoginFragment : Fragment() {
         view.btn_login.setOnClickListener {
             CustomUtils.hideKeyboard(activity)
             if (countryCodeHolder.text.isEmpty()) {
-                updateState("پیش شماره را نمی‌تواند خالی باشد", true)
+                updateState("Country Code cannot be empty!", true)
             } else if (progressBar.visibility != View.VISIBLE) {
                 progressBar.visibility = View.VISIBLE
                 btn_login.text = ""
                 if (isConnected) {
                     login()
                 } else {
-                    updateState("دستگاه به اینترنت متصل نیست", true)
+                    updateState("No Internet Connection!", true)
                 }
             }
 

@@ -29,7 +29,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/please_enter_activation_code_sent_to_989121233256"
         android:textColor="#9A9A9A"
-        android:textSize="15sp"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

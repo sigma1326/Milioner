@@ -26,10 +26,24 @@
         android:background="@drawable/ripple_ads"
         android:clickable="true"
         android:focusable="true"
-        app:layout_constraintBottom_toTopOf="@+id/layout_charge"
+        app:layout_constraintBottom_toTopOf="@+id/layout_game"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_balance" />
+
+    <View
+        android:id="@+id/layout_game"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:background="@drawable/ripple_game"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toTopOf="@id/layout_charge"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_show_ads"
+        app:layout_constraintVertical_chainStyle="spread" />
+
 
     <View
         android:id="@+id/layout_charge"
@@ -41,7 +55,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_show_ads"
+        app:layout_constraintTop_toBottomOf="@+id/layout_game"
         app:layout_constraintVertical_chainStyle="spread" />
 
     <TextView
@@ -119,6 +133,40 @@
         app:layout_constraintStart_toStartOf="@id/layout_show_ads"
         app:layout_constraintTop_toBottomOf="@+id/tv_show_ads_title"
         app:layout_constraintVertical_bias="0.0" />
+
+
+    <TextView
+        android:id="@+id/tv_play_game_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:fontFamily="@font/vazir_medium"
+        android:text="@string/play_game"
+        android:textColor="#ffffff"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_game"
+        app:layout_constraintEnd_toEndOf="@+id/layout_game"
+        app:layout_constraintStart_toStartOf="@id/layout_game"
+        app:layout_constraintTop_toTopOf="@+id/layout_game" />
+
+    <TextView
+        android:id="@+id/tv_play_game_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="@font/vazir_medium"
+        android:gravity="center"
+        android:text="@string/play_game_hint"
+        android:textAlignment="center"
+        android:textColor="#ffffff"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_game"
+        app:layout_constraintEnd_toEndOf="@+id/layout_game"
+        app:layout_constraintStart_toStartOf="@id/layout_game"
+        app:layout_constraintTop_toBottomOf="@+id/tv_play_game_title"
+        app:layout_constraintVertical_bias="0.0" />
+
 
     <TextView
         android:id="@+id/tv_charge_title"
