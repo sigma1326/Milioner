@@ -9,8 +9,10 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -329,48 +331,113 @@ class HomeFragment : Fragment() {
             }
         })
 
-        RxView.clicks(layout_show_ads).filter {
-            pb_ads.visibility != View.VISIBLE
-        }.subscribe {
-            pb_ads.visibility = View.VISIBLE
-
-            if (isConnected) {
-                showAds()
-            } else {
-                SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
-                    .setTitleText("دستگاه به اینترنت متصل نیست")
-                    .setConfirmText("باشه")
-                    .show()
-                pb_ads.visibility = View.GONE
-            }
-        }
-
-        RxView.clicks(layout_charge).filter {
-            pb_charge.visibility != View.VISIBLE
-        }.subscribe {
-            pb_charge.visibility = View.VISIBLE
-            if (isConnected) {
-                charge()
-            } else {
-                SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
-                    .setTitleText("دستگاه به اینترنت متصل نیست")
-                    .setConfirmText("باشه")
-                    .show()
-                pb_charge.visibility = View.GONE
-            }
-        }
-
-        RxView.clicks(layout_game)
-            .filter {
-                pb_charge.visibility != View.VISIBLE && pb_ads.visibility != View.VISIBLE
-            }
+        RxView.touches(layout_game)
             .subscribe {
-                try {
-                    findNavController().navigate(R.id.action_homeFragment_to_gameFragment)
-                } catch (e: Exception) {
+                if (it.actionMasked == MotionEvent.ACTION_DOWN) {
+                    val anim = AnimationUtils.loadAnimation(
+                        activity,
+                        R.anim.scale_down
+                    )
+                    tv_play_game_title.startAnimation(anim)
+                    tv_play_game_hint.startAnimation(anim)
+
+                } else if (it.actionMasked == MotionEvent.ACTION_UP || it.actionMasked == MotionEvent.ACTION_CANCEL) {
+                    val anim = AnimationUtils.loadAnimation(
+                        activity,
+                        R.anim.scale_up
+                    )
+                    tv_play_game_title.startAnimation(anim)
+                    tv_play_game_hint.startAnimation(anim)
+                    if (pb_charge.visibility != View.VISIBLE && pb_ads.visibility != View.VISIBLE && pb_play_game.visibility != View.VISIBLE) {
+                        try {
+                            pb_play_game.visibility = View.VISIBLE
+                            findNavController().navigate(R.id.action_homeFragment_to_gameFragment)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
                 }
             }
 
+        RxView.touches(layout_charge)
+            .subscribe {
+                if (it.actionMasked == MotionEvent.ACTION_DOWN) {
+                    val anim = AnimationUtils.loadAnimation(
+                        activity,
+                        R.anim.scale_down
+                    )
+                    tv_charge_title.startAnimation(anim)
+                    tv_charge_hint.startAnimation(anim)
+
+                } else if (it.actionMasked == MotionEvent.ACTION_UP || it.actionMasked == MotionEvent.ACTION_CANCEL) {
+                    val anim = AnimationUtils.loadAnimation(
+                        activity,
+                        R.anim.scale_up
+                    )
+                    tv_charge_title.startAnimation(anim)
+                    tv_charge_hint.startAnimation(anim)
+                    if (pb_charge.visibility != View.VISIBLE && pb_ads.visibility != View.VISIBLE && pb_play_game.visibility != View.VISIBLE) {
+                        pb_charge.visibility = View.VISIBLE
+                        if (isConnected) {
+                            charge()
+                        } else {
+                            SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
+                                .setTitleText("دستگاه به اینترنت متصل نیست")
+                                .setConfirmText("باشه")
+                                .show()
+                            pb_charge.visibility = View.GONE
+                        }
+                    }
+                }
+            }
+
+
+        RxView.touches(layout_show_ads)
+            .subscribe {
+                if (it.actionMasked == MotionEvent.ACTION_DOWN) {
+                    val anim = AnimationUtils.loadAnimation(
+                        activity,
+                        R.anim.scale_down
+                    )
+                    tv_show_ads_title.startAnimation(anim)
+                    tv_vpn_hint.startAnimation(anim)
+
+                } else if (it.actionMasked == MotionEvent.ACTION_UP || it.actionMasked == MotionEvent.ACTION_CANCEL) {
+                    val anim = AnimationUtils.loadAnimation(
+                        activity,
+                        R.anim.scale_up
+                    )
+                    tv_show_ads_title.startAnimation(anim)
+                    tv_vpn_hint.startAnimation(anim)
+                    if (pb_charge.visibility != View.VISIBLE && pb_ads.visibility != View.VISIBLE && pb_play_game.visibility != View.VISIBLE) {
+                        pb_ads.visibility = View.VISIBLE
+
+                        if (isConnected) {
+                            showAds()
+                        } else {
+                            SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
+                                .setTitleText("دستگاه به اینترنت متصل نیست")
+                                .setConfirmText("باشه")
+                                .show()
+                            pb_ads.visibility = View.GONE
+                        }
+                    }
+                }
+            }
+
+        findNavController().addOnDestinationChangedListener { controller, destination, arguments ->
+            when (destination.id) {
+                R.id.homeFragment -> {
+                    pb_play_game?.visibility = View.GONE
+                }
+                R.id.gameFragment -> {
+                    pb_play_game?.visibility = View.GONE
+                }
+                else -> {
+
+                }
+            }
+        }
     }
 
 
@@ -383,7 +450,7 @@ class HomeFragment : Fragment() {
                             pb_ads.visibility = View.VISIBLE
                             network.checkAds(object : ResponseListener {
                                 override fun onSuccess(message: String) {
-                                    Log.d(TAG,message)
+                                    Log.d(TAG, message)
                                     when (message) {
                                         "admob" -> {
                                             loadRewardedVideoAd()
@@ -392,7 +459,7 @@ class HomeFragment : Fragment() {
                                             AdColony.requestInterstitial(PlacementId.ZONE_ID, listener, adOptions)
                                         }
                                         else -> {
-                                            Log.d(TAG,"not defined ad")
+                                            Log.d(TAG, "not defined ad")
                                         }
                                     }
                                 }
