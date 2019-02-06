@@ -571,7 +571,6 @@ class MainActivityForeignMode : AppCompatActivity() {
                 super.onRewardsUnlocked(inMobiInterstitial, map)
                 Log.d(TAG, "onRewardsUnlocked 1 " + map!!.size)
                 updateState()
-                (this@MainActivityForeignMode.application as AppManager).callAdsAPI()
             }
         })
         viewModel.mInterstitialAd?.load()

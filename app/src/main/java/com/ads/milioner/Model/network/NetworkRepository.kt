@@ -12,5 +12,5 @@ interface NetworkRepository {
     fun charge(token: String, phone: String, responseListener: ResponseListener)
     fun checkIP(responseListener: ResponseListener)
     fun checkAds(responseListener: ResponseListener)
-    fun ads(token: String, gid: String, hash: String, timeStamp: String, responseListener: ResponseListener)
+    fun ads(token: String, gid: String, hash: String, timeStamp: String, reward: String, responseListener: ResponseListener)
 }

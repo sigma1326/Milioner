@@ -197,16 +197,17 @@ class AppManager : MultiDexApplication() {
         }
         if (user != null) {
             if (user.isRewardActive!!) {
+                val reward = "30"
                 val gid = UUID.randomUUID().toString()
                 val timeStamp = System.currentTimeMillis().toString()
-                val hashString = "$timeStamp$gid$timeStamp${user.apiKey}"
+                val hashString = "$timeStamp$gid$reward$timeStamp${user.apiKey}"
                 val hash = Hashing.sha256().hashString(hashString, StandardCharsets.UTF_8).toString()
 
 //                Log.d(AppManager.TAG, "before: " + db.getUser()?.balance.toString())
 
                 network.ads(
                     user.token.toString()
-                    , gid, hash, timeStamp
+                    , gid, hash, timeStamp, reward
                     , object : ResponseListener {
                         override fun onSuccess(message: String) {
                             Log.d(AppManager.TAG, message)

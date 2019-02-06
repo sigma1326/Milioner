@@ -6,6 +6,7 @@ import com.ads.milioner.Model.AppManager
 import com.ads.milioner.Model.database.DataBaseRepositoryImpl
 import com.ads.milioner.Model.database.model.User
 import com.ads.milioner.Model.network.model.*
+import com.google.gson.Gson
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 @SuppressLint("CheckResult")
@@ -60,9 +61,10 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
         gid: String,
         hash: String,
         timeStamp: String,
+        reward: String,
         responseListener: ResponseListener
     ) {
-        apiService.ads("jwt $token", gid, hash, timeStamp)
+        apiService.ads("jwt $token", gid, hash, timeStamp, reward)
             .subscribeOn(io.reactivex.schedulers.Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -81,20 +83,22 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
     }
 
     override fun checkIP(responseListener: ResponseListener) {
-        apiService.checkIP()
+        apiService.checkIpForAds()
             .subscribeOn(io.reactivex.schedulers.Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                if (it.body() is CheckIPResponse) {
-                    responseListener.onSuccess(it.body()!!.status.toString())
+                if (it.body() is CheckAdsResponse) {
+                    if (it.body()?.status!!) {
+                        responseListener.onSuccess("true")
+                    } else {
+                        responseListener.onFailure("false")
+                    }
                 } else {
-                    responseListener.onFailure("failed check ip")
-                    responseListener.onFailure(it.errorBody()?.string()!!.toString())
+                    responseListener.onFailure("false")
                 }
             }, {
                 it.printStackTrace()
-                responseListener.onFailure("failed check ip")
-
+                responseListener.onFailure("false")
             })
     }
 
@@ -112,8 +116,18 @@ class NetworkRepositoryImpl(private val apiService: ApiService, private val db: 
                         responseListener.onSuccess(it.body()!!.success.toString())
                     }
                 } else {
-                    responseListener.onFailure("failed charge")
-                    responseListener.onFailure(it.errorBody()?.string()!!.toString())
+                    try {
+                        val gson = Gson()
+                        val errorBody = gson.fromJson(it.errorBody()?.string().toString(), ChargeErrorBody::class.java)
+                        if (errorBody.Errors!![0] == "not enough money in your account") {
+                            responseListener.onFailure("اعتبار شما کافی نیست")
+                        }
+//                        responseListener.onFailure(errorBody.Errors!![0])
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        responseListener.onFailure("failed charge")
+//                        responseListener.onFailure(it.errorBody()?.string()!!.toString())
+                    }
                 }
             }, {
                 it.printStackTrace()

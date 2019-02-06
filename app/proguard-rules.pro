@@ -226,3 +226,18 @@
 
 # For removing warnings due to lack of Multi-Window support
 -dontwarn android.app.Activity
+
+
+
+
+# Remove the debug and verbose level Logging statements.
+# That means the code to generate the arguments to these methods will also not be called.
+# ONLY WORKS IF -dontoptimize IS _NOT_ USED in any ProGuard configs
+-assumenosideeffects class android.util.Log {
+public static *** d(...);
+public static *** v(...);
+}
+
+# Gson specific classes
+-keep class sun.misc.Unsafe { *; }
+-keep class com.google.gson.stream.** { *; }
